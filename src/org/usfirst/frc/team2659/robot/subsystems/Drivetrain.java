@@ -52,23 +52,23 @@ public class Drivetrain extends Subsystem {
 		while (i) 
 		{		
 			double leftEncoderCount = leftEncoder.get();
-			//double rightEncoderCount = rightEncoder.get();
-			double leftEncoderDistance = (leftEncoderCount / 256) * (2 * 3.14 * (1.589));
-			//double rightEncoderDistance = (rightEncoderCount / 256) * (2 * 3.14 * (1.75));
+			double rightEncoderCount = rightEncoder.get();
+			double leftEncoderDistance = (leftEncoderCount / 256) * (2 * 3.14 * (1.75));
+			double rightEncoderDistance = (rightEncoderCount / 256) * (2 * 3.14 * (1.75));
 			
 			/*double current0 = pdp.getCurrent(0);
 			double current1 = pdp.getCurrent(1);
 			double current14 = pdp.getCurrent(14);
 			double current15 = pdp.getCurrent(15);*/
 			
-			if (leftEncoderDistance < distance && (gyro.getAngle() <= 1 && gyro.getAngle() >= -1))
+			if (leftEncoderDistance < distance && rightEncoderDistance < distance && (gyro.getAngle() <= 1 && gyro.getAngle() >= -1))
 			{
 				myDrive.drive(-0.5, 0);
 			}
-			else if (leftEncoderDistance < distance && gyro.getAngle() > 1) {
+			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() > 1) {
 				myDrive.drive(-0.5, -0.1);
 			}
-			else if (leftEncoderDistance < distance &&  gyro.getAngle() < -1) {
+			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() < -1) {
 				myDrive.drive(-0.5, 0.1);
 			}
 			else if (t.get() > 7) {
@@ -125,12 +125,15 @@ public class Drivetrain extends Subsystem {
 	public void turnRight() {
 		myDrive.drive(0.75, 1);
 	}
+	
 	public void shiftHigh() {
 		cylinder.set(DoubleSolenoid.Value.kReverse);
 	}
+	
 	public void shiftLow() {
 		cylinder.set(DoubleSolenoid.Value.kForward);
 	}
+	
 	public void shiftDrive(boolean shift) {
 		
 		if(shift == true) {
