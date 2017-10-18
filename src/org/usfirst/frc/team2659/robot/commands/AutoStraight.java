@@ -21,7 +21,7 @@ public class AutoStraight extends Command {
     	Robot.drivetrain.driveForwardDistance(82);
     	Timer t = new Timer();
     	t.start();
-    	t.delay(0.5);
+    	Timer.delay(0.5);
     	while (t.get() < 2) {
     		Robot.intake.scoreGearAuto();
     	}

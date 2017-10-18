@@ -7,24 +7,32 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  *
  */
-public class AutoRight extends Command {
+public class TwoGearAuto extends Command {
 
-    public AutoRight() {
+    public TwoGearAuto() {
         // Use requires() here to declare subsystem dependencies
-    	requires(Robot.drivetrain);
-        requires(Robot.intake);
+       requires(Robot.drivetrain);
+       requires(Robot.intake);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
     	Robot.drivetrain.shiftLow();
-    	Robot.drivetrain.driveForwardDistance(73);
-    	Robot.drivetrain.rotate(60);
-    	Robot.drivetrain.driveForwardDistance(80);
+    	Robot.drivetrain.driveForwardDistance(82);
     	Timer t = new Timer();
     	t.start();
-    	Timer.delay(0.5);
-    	while (t.get() < 2) {
+    	Timer.delay(0.3);
+    	while (t.get() < 1) {
+    		Robot.intake.outtake();
+    	}
+    	//Robot.intake.stop();
+    	Robot.drivetrain.driveBackwardDistance(65);
+    	Robot.drivetrain.rotate(91);
+    	Robot.drivetrain.forwardWithIntakeDistance(70);
+    	Robot.drivetrain.driveBackwardDistance(65);
+    	Robot.drivetrain.rotate(-91);
+    	Robot.drivetrain.driveForwardDistance(82);
+    	while (t.get() < 13) {
     		Robot.intake.scoreGearAuto();
     	}
     	Robot.intake.stop();
@@ -32,8 +40,11 @@ public class AutoRight extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	
+    	    	
     }
-
+    	
+    
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
         return false;

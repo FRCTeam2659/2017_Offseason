@@ -5,9 +5,9 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-//import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.CameraServer;
 import org.usfirst.frc.team2659.robot.commands.*;
 import org.usfirst.frc.team2659.robot.subsystems.*;
 
@@ -27,7 +27,7 @@ public class Robot extends IterativeRobot {
     public static GearIntake intake;
 
     Command autonomousCommand;
-	//SendableChooser autoChooser;
+	SendableChooser<Command> autoChooser;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -37,19 +37,19 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		RobotMap.init();
-		
+		CameraServer.getInstance().startAutomaticCapture();
 		drivetrain = new Drivetrain();
 		climber = new Climber();
 		intake = new GearIntake();
 		
 		oi = new OI();	
 		
-		//autoChooser = new SendableChooser();
-		//autoChooser.addDefault("Auto 1 - left", new AutoLeft());
-		//autoChooser.addObject("Auto 2 - Straight Gear", new AutoStraight());
-		//autoChooser.addObject("Auto 3 - Right Gear", new AutoRight());
-		//autoChooser.addObject("Auto 4 - Left Gear", new AutoLeft());
-		//SmartDashboard.putData("Autonomous mode chooser", autoChooser);
+		autoChooser = new SendableChooser<Command>();
+		autoChooser.addDefault("Auto 1 - Two-gear Auto", new TwoGearAuto());
+		autoChooser.addObject("Auto 2 - Straight Gear", new AutoStraight());
+		autoChooser.addObject("Auto 3 - Right Gear", new AutoRight());
+		autoChooser.addObject("Auto 4 - Left Gear", new AutoLeft());
+		SmartDashboard.putData("Autonomous mode chooser", autoChooser);
 
 	}
 
@@ -81,8 +81,8 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		autonomousCommand = new AutoStraight();
-		//autonomousCommand = (Command) autoChooser.getSelected();
+		//autonomousCommand = new AutoStraight();
+		autonomousCommand = (Command) autoChooser.getSelected();
 		autonomousCommand.start();
 	}
 
