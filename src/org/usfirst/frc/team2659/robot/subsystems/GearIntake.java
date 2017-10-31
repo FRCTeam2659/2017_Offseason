@@ -28,25 +28,25 @@ public class GearIntake extends Subsystem {
         // Set the default command for a subsystem here.
     }
     public void autoRun() {	
-    	value = sensor.getVoltage();
-    	//current = powerPanel.getCurrent(4);
-    	//t.start();
-    	
-    	
-    	if (value < 0.5)  {
-	    	cylinder.set(DoubleSolenoid.Value.kReverse);
-	    	SC.set(-1);
-	    	//t.delay(0.5);
-    	}
-    	/*else if (value < 0.5 && current >= 10)
-    	{
-    		cylinder.set(DoubleSolenoid.Value.kReverse);
-    		SC.set(1);
-    	}*/
-    	else {
-    		SC.set(0);
+	    	value = sensor.getVoltage();
+	    	//current = powerPanel.getCurrent(4);
+	    	//t.start();
+	    	
+	    	
+	    	if (value < 0.5)  {
+		    	cylinder.set(DoubleSolenoid.Value.kReverse);
+		    	SC.set(-1);
+		    	//t.delay(0.5);
+	    	}
+	    	/*else if (value < 0.5 && current >= 10)
+	    	{
+	    		cylinder.set(DoubleSolenoid.Value.kReverse);
+	    		SC.set(1);
+	    	}*/
+	    	else {
+	    		SC.set(0);
 			cylinder.set(DoubleSolenoid.Value.kForward);
-    	}
+	    	}
     }
     
     public void autoRunReverse() {
@@ -54,23 +54,23 @@ public class GearIntake extends Subsystem {
 	    	SC.set(1);
     }
     public void scoreGearAuto() {
-    	SC.set(0.75);
-    	myDrive.drive(0.5, 0);
+	    	SC.set(0.75);
+	    	myDrive.drive(0.5, 0);
     }
     public void intakeUp() {
-    	cylinder.set(DoubleSolenoid.Value.kForward);
+    		cylinder.set(DoubleSolenoid.Value.kForward);
     }
     public void intakeDown() {
-    	cylinder.set(DoubleSolenoid.Value.kReverse);
+    		cylinder.set(DoubleSolenoid.Value.kReverse);
     }
     public void intake() {
-    	SC.set(-1);
+    		SC.set(-1);
     }
     public void outtake() {
-    	SC.set(1);
+    		SC.set(1);
     }
     public void stop() {
-    	SC.set(0);
+    		SC.set(0);
     }
 }
 

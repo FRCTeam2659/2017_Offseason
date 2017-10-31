@@ -28,14 +28,16 @@ public class TwoGearAuto extends Command {
     	//Robot.intake.stop();
     	Robot.drivetrain.driveBackwardDistance(65);
     	Robot.drivetrain.rotate(91);
-    	Robot.drivetrain.forwardWithIntakeDistance(70);
-    	Robot.drivetrain.driveBackwardDistance(65);
+    //	Robot.drivetrain.forwardWithIntakeDistance(70);
+    	Robot.drivetrain.autoIntakeShuffle();
+    	//Robot.drivetrain.driveBackwardDistance(65);
     	Robot.drivetrain.rotate(-91);
     	Robot.drivetrain.driveForwardDistance(82);
     	while (t.get() < 13) {
     		Robot.intake.scoreGearAuto();
     	}
     	Robot.intake.stop();
+    	Robot.drivetrain.stop();
     }
 
     // Called repeatedly when this Command is scheduled to run

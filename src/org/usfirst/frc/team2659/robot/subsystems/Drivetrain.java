@@ -24,7 +24,7 @@ public class Drivetrain extends Subsystem {
 	Encoder rightEncoder = RobotMap.rightEncoder;
 	ADXRS450_Gyro gyro = RobotMap.gyro;
 	PWMSpeedController SC = RobotMap.intakeSC;
-	DoubleSolenoid cylinders = RobotMap.intakeCylinder;
+	DoubleSolenoid intakeCylinder = RobotMap.intakeCylinder;
 	PowerDistributionPanel pdp = new PowerDistributionPanel();
 	Timer t = new Timer();
 
@@ -103,21 +103,16 @@ public void driveBackwardDistance(int distance) {
 			double rightEncoderCount = rightEncoder.get();
 			double leftEncoderDistance = (-leftEncoderCount / 256) * (2 * 3.14 * (1.75));
 			double rightEncoderDistance = (-rightEncoderCount / 256) * (2 * 3.14 * (1.75));
-			
-			/*double current0 = pdp.getCurrent(0);
-			double current1 = pdp.getCurrent(1);
-			double current14 = pdp.getCurrent(14);
-			double current15 = pdp.getCurrent(15);*/
-			
+
 			if (leftEncoderDistance < distance && rightEncoderDistance < distance && (gyro.getAngle() <= 1 && gyro.getAngle() >= -1))
 			{
-				myDrive.drive(0.6, 0);
+				myDrive.drive(1, 0);
 			}
 			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() > 1) {
-				myDrive.drive(0.6, -0.1);
+				myDrive.drive(0.7, -0.1);
 			}
 			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() < -1) {
-				myDrive.drive(0.6, 0.1);
+				myDrive.drive(0.7, 0.1);
 			}
 			else if (t.get() > 7) {
 				i = false;
@@ -125,15 +120,10 @@ public void driveBackwardDistance(int distance) {
 			else {
 				i = false;
 			}
-			/*else if (current0 > 15 || current1 > 15 || current14 > 15 || current15 > 15)
-			{
-				i = false;
-			}*/
-			
 		}
 		myDrive.drive(0, 0);
 	}
-	public void forwardWithIntakeDistance(int distance) {
+	/*public void forwardWithIntakeDistance(int distance) {
 		
 		leftEncoder.reset();
 		rightEncoder.reset();
@@ -141,7 +131,7 @@ public void driveBackwardDistance(int distance) {
 		t.reset();
 		t.start();
 		// Distance in Inches		
-		cylinders.set(DoubleSolenoid.Value.kReverse);
+		intakeCylinder.set(DoubleSolenoid.Value.kReverse);
 		SC.set(-1);
 		
 		boolean i = true;
@@ -151,11 +141,7 @@ public void driveBackwardDistance(int distance) {
 			double rightEncoderCount = rightEncoder.get();
 			double leftEncoderDistance = (-leftEncoderCount / 256) * (2 * 3.14 * (1.75));
 			double rightEncoderDistance = (-rightEncoderCount / 256) * (2 * 3.14 * (1.75));
-			
-			/*double current0 = pdp.getCurrent(0);
-			double current1 = pdp.getCurrent(1);
-			double current14 = pdp.getCurrent(14);
-			double current15 = pdp.getCurrent(15);*/
+		
 			
 			if (leftEncoderDistance < distance && rightEncoderDistance < distance && (gyro.getAngle() <= 1 && gyro.getAngle() >= -1))
 			{
@@ -173,14 +159,69 @@ public void driveBackwardDistance(int distance) {
 			else {
 				i = false;
 			}
-			/*else if (current0 > 15 || current1 > 15 || current14 > 15 || current15 > 15)
-			{
-				i = false;
-			}*/
 			
 		}
 		SC.set(0);
-		cylinder.set(DoubleSolenoid.Value.kForward);
+		intakeCylinder.set(DoubleSolenoid.Value.kForward);
+		myDrive.drive(0, 0);
+	}
+	*/
+	public void autoIntakeShuffle() {
+		
+		leftEncoder.reset();
+		rightEncoder.reset();
+		gyro.reset();
+		t.reset();
+		t.start();
+		// Distance in Inches		
+		intakeCylinder.set(DoubleSolenoid.Value.kReverse);
+		SC.set(-1);
+		
+		boolean i = true;
+		while (i) 
+		{		
+			if (RobotMap.gearSensor.getVoltage() < 0.5) {
+				if (gyro.getAngle() <= 1 && gyro.getAngle() >= -1)
+				{
+					myDrive.drive(0.6, 0);
+				}
+				else if (gyro.getAngle() > 1) {
+					myDrive.drive(0.6, -0.1);
+				}
+				else if (gyro.getAngle() < -1) {
+					myDrive.drive(0.6, 0.1);
+				}
+				else if (t.get() > 5) {
+					i = false;
+				}
+			}
+			else if (RobotMap.gearSensor.getVoltage() >= 0.5) {
+				intakeCylinder.set(DoubleSolenoid.Value.kForward);
+				SC.set(0);
+				if (leftEncoder.get() <= 0 && rightEncoder.get() <= 0 && gyro.getAngle() <= 1 && gyro.getAngle() >= -1)
+				{
+					myDrive.drive(1, 0);
+				}
+				else if (leftEncoder.get() <= 0 && rightEncoder.get() <= 0 && gyro.getAngle() > 1) {
+					myDrive.drive(0.7, -0.1);
+				}
+				else if (leftEncoder.get() <= 0 && rightEncoder.get() <= 0 && gyro.getAngle() < -1) {
+					myDrive.drive(0.7, 0.1);
+				}
+				else {
+					i = false;
+				}
+			}
+			else if (t.get() > 10) {
+				i = false;
+			}
+			else {
+				i = false;
+			}
+			
+		}
+		SC.set(0);
+		intakeCylinder.set(DoubleSolenoid.Value.kForward);
 		myDrive.drive(0, 0);
 	}
 	public void driveBackward() {
@@ -197,7 +238,7 @@ public void driveBackwardDistance(int distance) {
 			boolean i = true;
 			while (gyro.getAngle() < goal && i)
 			{
-				myDrive.tankDrive(-0.6, 0.6);
+				myDrive.tankDrive(-0.75, 0.75); //turn right
 				if (t.get() > 3) {
 					i = false;
 				}
@@ -206,7 +247,7 @@ public void driveBackwardDistance(int distance) {
 		else {
 			boolean i = true;
 			while (gyro.getAngle() > goal && i) {
-				myDrive.tankDrive(0.6, -0.6);
+				myDrive.tankDrive(0.75, -0.75); //turn left
 				if (t.get() > 3) {
 					i = false;
 				}
@@ -216,11 +257,11 @@ public void driveBackwardDistance(int distance) {
 	}
 	
 	public void turnLeft() {
-		myDrive.drive(0.75, -1);
+		myDrive.tankDrive(0.75, -0.75);
 	}
 	
 	public void turnRight() {
-		myDrive.drive(0.75, 1);
+		myDrive.tankDrive(-0.75, 0.75);
 	}
 	
 	public void shiftHigh() {
@@ -229,16 +270,6 @@ public void driveBackwardDistance(int distance) {
 	
 	public void shiftLow() {
 		cylinder.set(DoubleSolenoid.Value.kForward);
-	}
-	
-	public void shiftDrive(boolean shift) {
-		
-		if(shift == true) {
-			cylinder.set(DoubleSolenoid.Value.kForward);
-		}
-		else {
-			cylinder.set(DoubleSolenoid.Value.kReverse);		
-		}
 	}
 	
 	public void stop() {
