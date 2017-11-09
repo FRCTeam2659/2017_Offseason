@@ -28,6 +28,7 @@ public class AutoRight extends Command {
     		Robot.intake.scoreGearAuto();
     	}
     	Robot.intake.stop();
+    	Robot.drivetrain.stop();
     }
 
     // Called repeatedly when this Command is scheduled to run

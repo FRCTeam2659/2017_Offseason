@@ -33,6 +33,7 @@ public class TwoGearAutoLeft extends Command {
 	    	Robot.drivetrain.driveForwardDistance(85);
 	    	Timer.delay(0.3);
 	    	t.reset();
+	    	t.start();
 	    	while (t.get() < 1.5) {
 	    		Robot.intake.scoreGearAuto();
 	    	}
@@ -58,7 +59,7 @@ public class TwoGearAutoLeft extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	Robot.intake.stop();
-    	Robot.drivetrain.stop();
+	    	Robot.intake.stop();
+	    	Robot.drivetrain.stop();
     }
 }

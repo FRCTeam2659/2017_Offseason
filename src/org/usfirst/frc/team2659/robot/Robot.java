@@ -38,10 +38,12 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		RobotMap.init();
+		
 		new Thread(() -> {
             UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
             camera.setResolution(640, 480);
 		}).start();
+		
 		drivetrain = new Drivetrain();
 		climber = new Climber();
 		intake = new GearIntake();
@@ -50,12 +52,11 @@ public class Robot extends IterativeRobot {
 		
 		autoChooser = new SendableChooser<Command>();
 		autoChooser.addDefault("Auto 1 - Two-gear Auto Right", new TwoGearAutoRight());
-		autoChooser.addDefault("Auto 2 - Two-gear Auto Left", new TwoGearAutoLeft());
+		autoChooser.addObject("Auto 2 - Two-gear Auto Left", new TwoGearAutoLeft());
 		autoChooser.addObject("Auto 3 - Straight Gear", new AutoStraight());
 		autoChooser.addObject("Auto 4 - Right Gear", new AutoRight());
 		autoChooser.addObject("Auto 5 - Left Gear", new AutoLeft());
-		SmartDashboard.putData("Autonomous mode chooser", autoChooser);
-
+		SmartDashboard.putData("Autonomous chooser", autoChooser);
 	}
 
 	/**

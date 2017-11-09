@@ -18,11 +18,11 @@ public class Climber extends Subsystem {
     }
     
     public void climbup() {
-    	SC.set(1);
+    		SC.set(1);
     }
     
     public void stop() {
-    	SC.set(0);
+    		SC.set(0);
     }
 }
 

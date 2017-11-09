@@ -27,6 +27,7 @@ public class Drivetrain extends Subsystem {
 	DoubleSolenoid intakeCylinder = RobotMap.intakeCylinder;
 	//PowerDistributionPanel pdp = new PowerDistributionPanel();
 	Timer t = new Timer();
+	private double critical = 1.62 * 2 * 3.1416 / 256;
 
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
@@ -43,16 +44,15 @@ public class Drivetrain extends Subsystem {
 		rightEncoder.reset();
 		gyro.reset();
 		t.reset();
-		t.start();
-		// Distance in Inches		
+		t.start();	
 		
 		boolean i = true;
 		while (i) 
 		{		
 			double leftEncoderCount = leftEncoder.get();
 			double rightEncoderCount = rightEncoder.get();
-			double leftEncoderDistance = (leftEncoderCount / 256) * (2 * 3.14 * (1.75));
-			double rightEncoderDistance = (rightEncoderCount / 256) * (2 * 3.14 * (1.75));
+			double leftEncoderDistance = leftEncoderCount * critical; // Distance in Inches	
+			double rightEncoderDistance = rightEncoderCount * critical;
 			
 			/*double current0 = pdp.getCurrent(0);
 			double current1 = pdp.getCurrent(1);
@@ -78,12 +78,12 @@ public class Drivetrain extends Subsystem {
 			/*else if (current0 > 15 || current1 > 15 || current14 > 15 || current15 > 15)
 			{
 				i = false;
-			}*/
-			
+			}*/			
 		}
 		myDrive.drive(0, 0);
+		t.stop();
 	}
-public void driveBackwardDistance(int distance) {
+	public void driveBackwardDistance(int distance) {
 		
 		leftEncoder.reset();
 		rightEncoder.reset();
@@ -97,18 +97,18 @@ public void driveBackwardDistance(int distance) {
 		{		
 			double leftEncoderCount = leftEncoder.get();
 			double rightEncoderCount = rightEncoder.get();
-			double leftEncoderDistance = (-leftEncoderCount / 256) * (2 * 3.14 * (1.75));
-			double rightEncoderDistance = (-rightEncoderCount / 256) * (2 * 3.14 * (1.75));
+			double leftEncoderDistance = -leftEncoderCount * critical;
+			double rightEncoderDistance = -rightEncoderCount * critical;
 
 			if (leftEncoderDistance < distance && rightEncoderDistance < distance && (gyro.getAngle() <= 1 && gyro.getAngle() >= -1))
 			{
-				myDrive.drive(1, 0);
+				myDrive.drive(0.8, 0);
 			}
 			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() > 1) {
-				myDrive.drive(1, 0.1);
+				myDrive.drive(0.8, 0.1);
 			}
 			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() < -1) {
-				myDrive.drive(1, -0.1);
+				myDrive.drive(0.8, -0.1);
 			}
 			else if (t.get() > 4) {
 				i = false;
@@ -117,6 +117,8 @@ public void driveBackwardDistance(int distance) {
 				i = false;
 			}
 		}
+		
+		t.stop();
 		myDrive.drive(0, 0);
 	}
 
@@ -146,6 +148,9 @@ public void driveBackwardDistance(int distance) {
 					myDrive.drive(-0.6, 0.1);
 				}
 				else if (t.get() > 4) {
+					SC.set(0);
+					intakeCylinder.set(DoubleSolenoid.Value.kForward);
+					myDrive.drive(0, 0);
 					i = false;
 				}
 			}
@@ -154,28 +159,26 @@ public void driveBackwardDistance(int distance) {
 				SC.set(0);
 				if (leftEncoder.get() >= 0 && rightEncoder.get() >= 0 && gyro.getAngle() <= 1 && gyro.getAngle() >= -1)
 				{
-					myDrive.drive(1, 0);
+					myDrive.drive(0.8, 0);
 				}
 				else if (leftEncoder.get() >= 0 && rightEncoder.get() >= 0 && gyro.getAngle() > 1) {
-					myDrive.drive(1, 0.1);
+					myDrive.drive(0.8, 0.1);
 				}
 				else if (leftEncoder.get() >= 0 && rightEncoder.get() >= 0 && gyro.getAngle() < -1) {
-					myDrive.drive(1, -0.1);
+					myDrive.drive(0.8, -0.1);
 				}
-				else if (t.get() > 3) {
+				else if (t.get() > 6) { //the time has to be greater than the first segment!!!
 					i = false;
 				}
-			}
-			else {
-				i = false;
 			}		
 		}
 		
-		SC.set(0);
-		intakeCylinder.set(DoubleSolenoid.Value.kForward);
 		myDrive.drive(0, 0);
+		t.stop();
 	}
-	public void driveBackward() {
+	
+	//Don't delete the code under!
+	public void driveBackward() { 
 		myDrive.drive(0.5, 0);
 	}
 	
@@ -205,6 +208,7 @@ public void driveBackwardDistance(int distance) {
 			}
 		}
 		myDrive.drive(0, 0);
+		t.stop();
 	}
 	
 	public void shiftHigh() {

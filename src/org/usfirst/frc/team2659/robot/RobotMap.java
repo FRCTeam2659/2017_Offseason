@@ -86,11 +86,10 @@ public class RobotMap {
     	SmartDashboard.putNumber("Left Encoder", leftEncoder.get());
     	SmartDashboard.putNumber("Right Encoder", rightEncoder.get());
     	SmartDashboard.putNumber("gyro", gyro.getAngle());
-    	SmartDashboard.putNumber("pdp 0", pdp.getCurrent(0));
-    	SmartDashboard.putNumber("pdp 1", pdp.getCurrent(1));
-    	SmartDashboard.putNumber("pdp 14", pdp.getCurrent(14));
-    	SmartDashboard.putNumber("pdp 15", pdp.getCurrent(15));
-    	//SmartDashboard.putNumber("pdp 4", pdp.getCurrent(4));
-    	SmartDashboard.putNumber("Gear Sensor", gearSensor.getVoltage());
+    //SmartDashboard.putNumber("pdp 0", pdp.getCurrent(0));
+    	//SmartDashboard.putNumber("pdp 1", pdp.getCurrent(1));
+    	//SmartDashboard.putNumber("pdp 14", pdp.getCurrent(14));
+    //SmartDashboard.putNumber("pdp 15", pdp.getCurrent(15));
+    SmartDashboard.putNumber("Gear Sensor", gearSensor.getVoltage());
     }
 }
