@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.cscore.UsbCamera;
+//import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import org.usfirst.frc.team2659.robot.commands.*;
 import org.usfirst.frc.team2659.robot.subsystems.*;
@@ -39,11 +39,12 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		RobotMap.init();
 		
-		new Thread(() -> {
-            UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-            camera.setResolution(640, 480);
-		}).start();
-		
+		//new Thread(() -> {
+        //UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+            //camera.setResolution(480, 320);
+		//}).start();
+        CameraServer.getInstance().startAutomaticCapture();      
+        
 		drivetrain = new Drivetrain();
 		climber = new Climber();
 		intake = new GearIntake();
@@ -51,11 +52,9 @@ public class Robot extends IterativeRobot {
 		oi = new OI();	
 		
 		autoChooser = new SendableChooser<Command>();
-		autoChooser.addDefault("Auto 1 - Two-gear Auto Right", new TwoGearAutoRight());
-		autoChooser.addObject("Auto 2 - Two-gear Auto Left", new TwoGearAutoLeft());
-		autoChooser.addObject("Auto 3 - Straight Gear", new AutoStraight());
-		autoChooser.addObject("Auto 4 - Right Gear", new AutoRight());
-		autoChooser.addObject("Auto 5 - Left Gear", new AutoLeft());
+		autoChooser.addDefault("Auto 1 - Straight Gear", new AutoStraight());
+		autoChooser.addObject("Auto 2 - Right Gear", new AutoRight());
+		autoChooser.addObject("Auto 3 - Left Gear", new AutoLeft());
 		SmartDashboard.putData("Autonomous chooser", autoChooser);
 	}
 

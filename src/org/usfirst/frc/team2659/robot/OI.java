@@ -1,9 +1,7 @@
 package org.usfirst.frc.team2659.robot;
 
 
-
 import org.usfirst.frc.team2659.robot.commands.*;
-
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -33,32 +31,32 @@ public class OI {
 		driveStick = new Joystick(0);
 		operatorStick = new Joystick(1);
 		
-		operatorButton1 = new JoystickButton(operatorStick, 1);
-		operatorButton1.whileHeld(new GearIntakeIn());
-		
-		operatorButton3 = new JoystickButton(operatorStick, 3);
+		operatorButton3 = new JoystickButton(operatorStick, 2);
 		operatorButton3.whileHeld(new GearIntakeOut());
 		
-		operatorButton2 = new JoystickButton(operatorStick, 2);
+		operatorButton1 = new JoystickButton(operatorStick, 3);
+		operatorButton1.whileHeld(new GearIntakeIn());
+		
+		operatorButton2 = new JoystickButton(operatorStick, 1);
 		operatorButton2.whileHeld(new GearIntakeDown());
 		
 		operatorButton4 = new JoystickButton(operatorStick, 4);
 		operatorButton4.whileHeld(new GearIntakeUp());
 		
-		operatorButton5 = new JoystickButton(operatorStick, 5);
-		operatorButton5.whileHeld(new climb());
-		
 		/*operatorButton5 = new JoystickButton(operatorStick, 6);
 		operatorButton5.whileHeld(new GearOutakeAuto());
 		operatorButton5.whenReleased(new stopIntake());*/
 		
-		operatorButton7 = new JoystickButton(operatorStick, 7);
+		operatorButton7 = new JoystickButton(operatorStick, 5);
 		operatorButton7.whileHeld(new GearIntakeAuto());
 		operatorButton7.whenReleased(new GearIntakeUp());
 		
-		operatorButton8 = new JoystickButton(operatorStick, 8);
+		operatorButton8 = new JoystickButton(operatorStick, 6);
 		operatorButton8.whileHeld(new ScoreGear());
 		operatorButton8.whenReleased(new stopIntake());
+		
+		operatorButton5 = new JoystickButton(operatorStick, 7);
+		operatorButton5.whileHeld(new climb());
 		
 		driveButton2 = new JoystickButton(driveStick, 7);
 		driveButton2.whileHeld(new shiftLow());

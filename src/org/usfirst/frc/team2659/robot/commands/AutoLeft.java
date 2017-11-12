@@ -18,12 +18,12 @@ public class AutoLeft extends Command {
     // Called just before this Command runs the first time
     protected void initialize() {
     	Robot.drivetrain.shiftLow();
-    	Robot.drivetrain.driveForwardDistance(73);
+    	Robot.drivetrain.driveForwardDistance(71);
     	Robot.drivetrain.rotate(-60);
-    	Robot.drivetrain.driveForwardDistance(80);
+    	Robot.drivetrain.driveForwardDistance(86);
     	Timer t = new Timer();
     	t.start();
-    	Timer.delay(0.5);
+    	Timer.delay(0.4);
     	while (t.get() < 2) {
     		Robot.intake.scoreGearAuto();
     	}

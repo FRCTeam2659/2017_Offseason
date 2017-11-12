@@ -5,10 +5,14 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import org.usfirst.frc.team2659.robot.RobotMap;
 import org.usfirst.frc.team2659.robot.commands.drive;
+
+import com.ctre.CANTalon;
+
 import edu.wpi.first.wpilibj.command.Subsystem;
 //import edu.wpi.first.wpilibj.PowerDistributionPanel;
 /**
@@ -19,6 +23,8 @@ public class Drivetrain extends Subsystem {
 	// here. Call these from Commands.
 	
 	RobotDrive myDrive = RobotMap.myRobot;
+	CANTalon leftFrontSC = RobotMap.leftFrontSC;
+	PIDController leftFrontPID = RobotMap.leftFrontPID;
 	DoubleSolenoid cylinder = RobotMap.shiftCylinder;
 	Encoder leftEncoder = RobotMap.leftEncoder;
 	Encoder rightEncoder = RobotMap.rightEncoder;
@@ -27,16 +33,14 @@ public class Drivetrain extends Subsystem {
 	DoubleSolenoid intakeCylinder = RobotMap.intakeCylinder;
 	//PowerDistributionPanel pdp = new PowerDistributionPanel();
 	Timer t = new Timer();
-	private double critical = 1.62 * 2 * 3.1416 / 256;
+	private double critical = 3.2 * 3.141 / 256;
 
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
 		setDefaultCommand(new drive());
 	}
 	
-	public void warriorDrive(double y, double z) {
-		myDrive.arcadeDrive(y, z);
-	}
+	
 	
 	public void driveForwardDistance(int distance) {
 		
@@ -52,24 +56,24 @@ public class Drivetrain extends Subsystem {
 			double leftEncoderCount = leftEncoder.get();
 			double rightEncoderCount = rightEncoder.get();
 			double leftEncoderDistance = leftEncoderCount * critical; // Distance in Inches	
-			double rightEncoderDistance = rightEncoderCount * critical;
+			double rightEncoderDistance = -rightEncoderCount * critical;
 			
 			/*double current0 = pdp.getCurrent(0);
 			double current1 = pdp.getCurrent(1);
 			double current14 = pdp.getCurrent(14);
 			double current15 = pdp.getCurrent(15);*/
 			
-			if (leftEncoderDistance < distance && rightEncoderDistance < distance && (gyro.getAngle() <= 1 && gyro.getAngle() >= -1))
+			if (leftEncoderDistance < distance && rightEncoderDistance < distance && (gyro.getAngle() <= 1.5 && gyro.getAngle() >= -1.5))
 			{
-				myDrive.drive(-0.6, 0);
+				myDrive.drive(-0.5, 0);
 			}
 			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() > 1) {
-				myDrive.drive(-0.6, -0.1);
+				myDrive.drive(-0.5, -0.1);
 			}
 			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() < -1) {
-				myDrive.drive(-0.6, 0.1);
+				myDrive.drive(-0.5, 0.1);
 			}
-			else if (t.get() > 5) {
+			else if (t.get() > 6) {
 				i = false;
 			}
 			else {
@@ -98,7 +102,7 @@ public class Drivetrain extends Subsystem {
 			double leftEncoderCount = leftEncoder.get();
 			double rightEncoderCount = rightEncoder.get();
 			double leftEncoderDistance = -leftEncoderCount * critical;
-			double rightEncoderDistance = -rightEncoderCount * critical;
+			double rightEncoderDistance = rightEncoderCount * critical;
 
 			if (leftEncoderDistance < distance && rightEncoderDistance < distance && (gyro.getAngle() <= 1 && gyro.getAngle() >= -1))
 			{
@@ -192,7 +196,7 @@ public class Drivetrain extends Subsystem {
 			boolean i = true;
 			while (gyro.getAngle() < goal && i)
 			{
-				myDrive.tankDrive(-0.7, 0.7); //turn right
+				myDrive.tankDrive(-0.5, 0.5); //turn right 0.7 old value
 				if (t.get() > 4) {
 					i = false;
 				}
@@ -201,7 +205,7 @@ public class Drivetrain extends Subsystem {
 		else {
 			boolean i = true;
 			while (gyro.getAngle() > goal && i) {
-				myDrive.tankDrive(0.7, -0.7); //turn left
+				myDrive.tankDrive(0.5, -0.5); //turn left
 				if (t.get() > 4) {
 					i = false;
 				}
@@ -219,7 +223,14 @@ public class Drivetrain extends Subsystem {
 		cylinder.set(DoubleSolenoid.Value.kForward);
 	}
 	
+	public void warriorDrive(double y, double z) {
+		leftFrontPID.setSetpoint(y*256);
+		leftFrontPID.enable();
+		//myDrive.arcadeDrive(y, z);
+	}
+	
 	public void stop() {
 		myDrive.drive(0,0);
+		leftFrontPID.disable();
 	}
 }

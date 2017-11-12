@@ -18,11 +18,11 @@ public class TwoGearAutoLeft extends Command {
     // Called just before this Command runs the first time
     protected void initialize() {
 	    	Robot.drivetrain.shiftLow();
-	    	Robot.drivetrain.driveForwardDistance(82);
+	    	Robot.drivetrain.driveForwardDistance(81);
 	    	Timer t = new Timer();
 	    	t.start();
 	    	Timer.delay(0.3);
-	    	while (t.get() < 1.1) {
+	    	while (t.get() < 1) {
 	    		Robot.intake.outtake();
 	    	}
 	    	Robot.intake.stop();

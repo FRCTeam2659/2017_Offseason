@@ -53,16 +53,19 @@ public class GearIntake extends Subsystem {
 	    	SC.set(1);
     }
     public void scoreGearAuto() { //all autonomous commands and operator use this method
+    	SC.set(1);
     		if (i) {
-		    	SC.set(1	);
 		    	t.start();
 		    	i = false;
     		}
-	    	if (t.get() > 0.3) {
-	    		t.stop();
-	    		SC.set(1	);
+	    	if (t.get() > 0.15 && t.get() < 0.4) {
 	    		myDrive.drive(0.5, 0);
-	    		
+	    		cylinder.set(DoubleSolenoid.Value.kReverse);
+	    	}
+	    	if (t.get() >= 0.4) {
+	    		t.stop();
+	    		myDrive.drive(0.5, 0);
+	    		cylinder.set(DoubleSolenoid.Value.kForward);
 	    	}
     }
     public void intakeUp() {

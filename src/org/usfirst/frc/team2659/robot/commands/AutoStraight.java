@@ -18,10 +18,10 @@ public class AutoStraight extends Command {
     // Called just before this Command runs the first time
     protected void initialize() {
     	Robot.drivetrain.shiftLow();
-    	Robot.drivetrain.driveForwardDistance(82);
+    	Robot.drivetrain.driveForwardDistance(81);
     	Timer t = new Timer();
     	t.start();
-    	Timer.delay(0.5);
+    	Timer.delay(0.4);
     	while (t.get() < 2) {
     		Robot.intake.scoreGearAuto();
     	}

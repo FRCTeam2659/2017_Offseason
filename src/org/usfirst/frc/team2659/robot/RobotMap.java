@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.VictorSP;
@@ -26,6 +27,7 @@ public class RobotMap {
 	public static PWMSpeedController climberSC;
 	public static PWMSpeedController intakeSC;
 	public static PowerDistributionPanel pdp;
+	public static PIDController leftFrontPID;
 	
     public static DoubleSolenoid intakeCylinder;
     public static DoubleSolenoid shiftCylinder;
@@ -75,6 +77,11 @@ public class RobotMap {
     	rightEncoder = new Encoder(2,3,false);
     	LiveWindow.addSensor("Drivetrain", "Right Encoder", (Encoder) rightEncoder);
     	
+    	leftFrontPID = new PIDController(6.0e-8, 0.0, 9.0e-5, leftEncoder, leftFrontSC);
+    	leftFrontPID.setContinuous(false);
+    	leftFrontPID.setAbsoluteTolerance(100);
+    	leftFrontPID.setOutputRange(-1, 1);
+    	
     	gyro = new ADXRS450_Gyro();
     	LiveWindow.addSensor("Drivetrain", "Gyro", (ADXRS450_Gyro) gyro);
     	
@@ -84,12 +91,12 @@ public class RobotMap {
     }
     public static void periodic() {
     	SmartDashboard.putNumber("Left Encoder", leftEncoder.get());
-    	SmartDashboard.putNumber("Right Encoder", rightEncoder.get());
+    	SmartDashboard.putNumber("Right Encoder", -rightEncoder.get());
     	SmartDashboard.putNumber("gyro", gyro.getAngle());
-    //SmartDashboard.putNumber("pdp 0", pdp.getCurrent(0));
+    	//SmartDashboard.putNumber("pdp 0", pdp.getCurrent(0));
     	//SmartDashboard.putNumber("pdp 1", pdp.getCurrent(1));
     	//SmartDashboard.putNumber("pdp 14", pdp.getCurrent(14));
-    //SmartDashboard.putNumber("pdp 15", pdp.getCurrent(15));
-    SmartDashboard.putNumber("Gear Sensor", gearSensor.getVoltage());
+    	//SmartDashboard.putNumber("pdp 15", pdp.getCurrent(15));
+    	SmartDashboard.putNumber("Gear Sensor", gearSensor.getVoltage());
     }
 }
