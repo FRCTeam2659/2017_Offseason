@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.VictorSP;
@@ -28,6 +29,7 @@ public class RobotMap {
 	public static PWMSpeedController intakeSC;
 	public static PowerDistributionPanel pdp;
 	public static PIDController leftFrontPID;
+	public static PIDController leftRearPID;
 	
     public static DoubleSolenoid intakeCylinder;
     public static DoubleSolenoid shiftCylinder;
@@ -43,15 +45,19 @@ public class RobotMap {
     	pdp = new PowerDistributionPanel();
     	
     	leftFrontSC = new CANTalon(2);
+    	leftFrontSC.setInverted(true);
     	LiveWindow.addActuator("Drivetrain", "Left Front", (CANTalon) leftFrontSC);
     	
     	leftRearSC = new CANTalon(3);
     	LiveWindow.addActuator("Drivetrain", "Left Rear", (CANTalon) leftRearSC);
+    	leftRearSC.setInverted(true);
     	
     	rightFrontSC = new CANTalon(0);
+    	rightFrontSC.setInverted(true);
     	LiveWindow.addActuator("Drivetrain", "Right Front", (CANTalon) rightFrontSC);
     	
     	rightRearSC = new CANTalon(1);
+    	rightRearSC.setInverted(true);
     	LiveWindow.addActuator("Drivetrain", "Right Rear", (CANTalon) rightRearSC);
     	
     	myRobot = new RobotDrive(leftFrontSC, leftRearSC, rightFrontSC, rightRearSC);
@@ -77,17 +83,10 @@ public class RobotMap {
     	rightEncoder = new Encoder(2,3,false);
     	LiveWindow.addSensor("Drivetrain", "Right Encoder", (Encoder) rightEncoder);
     	
-    	leftFrontPID = new PIDController(6.0e-8, 0.0, 9.0e-5, leftEncoder, leftFrontSC);
-    	leftFrontPID.setContinuous(false);
-    	leftFrontPID.setAbsoluteTolerance(100);
-    	leftFrontPID.setOutputRange(-1, 1);
-    	
     	gyro = new ADXRS450_Gyro();
-    	LiveWindow.addSensor("Drivetrain", "Gyro", (ADXRS450_Gyro) gyro);
-    	
+    	gyro.setPIDSourceType(PIDSourceType.kDisplacement);
     	gyro.calibrate();
     	gyro.reset();
-    	
     }
     public static void periodic() {
     	SmartDashboard.putNumber("Left Encoder", leftEncoder.get());

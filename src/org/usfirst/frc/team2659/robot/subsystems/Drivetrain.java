@@ -24,7 +24,9 @@ public class Drivetrain extends Subsystem {
 	
 	RobotDrive myDrive = RobotMap.myRobot;
 	CANTalon leftFrontSC = RobotMap.leftFrontSC;
-	PIDController leftFrontPID = RobotMap.leftFrontPID;
+	CANTalon leftRearSC = RobotMap.leftRearSC;
+	CANTalon rightFrontSC = RobotMap.rightFrontSC;
+	CANTalon rightRearSC = RobotMap.rightRearSC;
 	DoubleSolenoid cylinder = RobotMap.shiftCylinder;
 	Encoder leftEncoder = RobotMap.leftEncoder;
 	Encoder rightEncoder = RobotMap.rightEncoder;
@@ -32,6 +34,11 @@ public class Drivetrain extends Subsystem {
 	PWMSpeedController SC = RobotMap.intakeSC;
 	DoubleSolenoid intakeCylinder = RobotMap.intakeCylinder;
 	//PowerDistributionPanel pdp = new PowerDistributionPanel();
+	PIDController leftFrontPID = new PIDController(0.02, 0.0, 0.0, gyro, leftFrontSC); //.00005
+	PIDController leftRearPID = new PIDController(0.02, 0.0, 0.0, gyro, leftRearSC);
+	PIDController rightFrontPID = new PIDController(0.02, 0.0, 0.0, gyro, rightFrontSC);
+	PIDController rightRearPID = new PIDController(0.02, 0.0, 0.0, gyro, rightRearSC);
+	
 	Timer t = new Timer();
 	private double critical = 3.2 * 3.141 / 256;
 
@@ -187,10 +194,27 @@ public class Drivetrain extends Subsystem {
 	}
 	
 	public void rotate(int degrees) {
-		t.reset();
-		t.start();
+		//t.reset();
+		//t.start();
 		gyro.reset();
-		double status = gyro.getAngle();
+		leftFrontPID.setOutputRange(-1.0, 1.0);
+		leftRearPID.setOutputRange(-1.0, 1.0);
+		rightFrontPID.setOutputRange(-1.0, 1.0);
+		rightRearPID.setOutputRange(-1.0, 1.0);
+		leftFrontPID.setContinuous(false);
+		leftRearPID.setContinuous(false);
+		rightFrontPID.setContinuous(false);
+		rightRearPID.setContinuous(false);
+		leftFrontPID.setSetpoint(degrees);
+    	leftRearPID.setSetpoint(degrees);
+    	rightFrontPID.setSetpoint(degrees);
+    	rightRearPID.setSetpoint(degrees);
+    	rightFrontPID.enable();
+    	rightRearPID.enable();
+    	leftFrontPID.enable();
+    	leftRearPID.enable();
+    	
+		/*double status = gyro.getAngle();
 		double goal = degrees + status;
 		if (degrees > 0) {
 			boolean i = true;
@@ -212,7 +236,7 @@ public class Drivetrain extends Subsystem {
 			}
 		}
 		myDrive.drive(0, 0);
-		t.stop();
+		t.stop();*/
 	}
 	
 	public void shiftHigh() {
@@ -224,13 +248,14 @@ public class Drivetrain extends Subsystem {
 	}
 	
 	public void warriorDrive(double y, double z) {
-		leftFrontPID.setSetpoint(y*256);
-		leftFrontPID.enable();
-		//myDrive.arcadeDrive(y, z);
+		myDrive.arcadeDrive(-y, -z);
 	}
 	
 	public void stop() {
-		myDrive.drive(0,0);
 		leftFrontPID.disable();
+		leftRearPID.disable();
+		rightFrontPID.disable();
+		rightRearPID.disable();
+		myDrive.drive(0,0);
 	}
 }
