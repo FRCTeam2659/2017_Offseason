@@ -78,20 +78,22 @@ public class RobotMap {
     	LiveWindow.addSensor("Intake", "Proxy Sensor", (AnalogInput) gearSensor);
     	
     	leftEncoder = new Encoder(0,1,false);
+    	leftEncoder.setDistancePerPulse(3.2*Math.PI/256);
     	LiveWindow.addSensor("Drivetrain", "Left Encoder", (Encoder) leftEncoder);
     	
     	rightEncoder = new Encoder(2,3,false);
+    	rightEncoder.setDistancePerPulse(3.2*Math.PI/256);
     	LiveWindow.addSensor("Drivetrain", "Right Encoder", (Encoder) rightEncoder);
     	
-    	gyro = new ADXRS450_Gyro();
+    	/*gyro = new ADXRS450_Gyro();
     	gyro.setPIDSourceType(PIDSourceType.kDisplacement);
     	gyro.calibrate();
-    	gyro.reset();
+    	gyro.reset();*/
     }
     public static void periodic() {
     	SmartDashboard.putNumber("Left Encoder", leftEncoder.get());
     	SmartDashboard.putNumber("Right Encoder", -rightEncoder.get());
-    	SmartDashboard.putNumber("gyro", gyro.getAngle());
+    	//SmartDashboard.putNumber("gyro", gyro.getAngle());
     	//SmartDashboard.putNumber("pdp 0", pdp.getCurrent(0));
     	//SmartDashboard.putNumber("pdp 1", pdp.getCurrent(1));
     	//SmartDashboard.putNumber("pdp 14", pdp.getCurrent(14));

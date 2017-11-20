@@ -34,26 +34,42 @@ public class Drivetrain extends Subsystem {
 	PWMSpeedController SC = RobotMap.intakeSC;
 	DoubleSolenoid intakeCylinder = RobotMap.intakeCylinder;
 	//PowerDistributionPanel pdp = new PowerDistributionPanel();
-	PIDController leftFrontPID = new PIDController(0.02, 0.0, 0.0, gyro, leftFrontSC); //.00005
-	PIDController leftRearPID = new PIDController(0.02, 0.0, 0.0, gyro, leftRearSC);
-	PIDController rightFrontPID = new PIDController(0.02, 0.0, 0.0, gyro, rightFrontSC);
-	PIDController rightRearPID = new PIDController(0.02, 0.0, 0.0, gyro, rightRearSC);
+	PIDController leftFrontPID;
+	PIDController leftRearPID;
+	PIDController rightFrontPID;
+	PIDController rightRearPID;
 	
 	Timer t = new Timer();
-	private double critical = 3.2 * 3.141 / 256;
+	private final double critical = 3.2 * 3.141 / 256;
 
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
 		setDefaultCommand(new drive());
 	}
 	
-	
-	
 	public void driveForwardDistance(int distance) {
+		leftFrontPID = new PIDController(0.025, 0.00005, 0.0, leftEncoder, leftFrontSC);
+		leftRearPID = new PIDController(0.025, 0.00005, 0.0, leftEncoder, leftRearSC);
+		rightFrontPID = new PIDController(0.025, 0.00005, 0.0, rightEncoder, rightFrontSC);
+		rightRearPID = new PIDController(0.025, 0.00005, 0.0, rightEncoder, rightRearSC);
 		
 		leftEncoder.reset();
 		rightEncoder.reset();
-		gyro.reset();
+		
+		leftFrontPID.setOutputRange(-1.0, 1.0);
+		leftRearPID.setOutputRange(-1.0, 1.0);
+		rightFrontPID.setOutputRange(-1.0, 1.0);
+		rightRearPID.setOutputRange(-1.0, 1.0);
+		leftFrontPID.setSetpoint(distance);
+    	leftRearPID.setSetpoint(distance);
+    	rightFrontPID.setSetpoint(distance);
+    	rightRearPID.setSetpoint(distance);
+    	rightFrontPID.enable();
+    	rightRearPID.enable();
+    	leftFrontPID.enable();
+    	leftRearPID.enable();
+		
+		/*gyro.reset();
 		t.reset();
 		t.start();	
 		
@@ -64,11 +80,6 @@ public class Drivetrain extends Subsystem {
 			double rightEncoderCount = rightEncoder.get();
 			double leftEncoderDistance = leftEncoderCount * critical; // Distance in Inches	
 			double rightEncoderDistance = -rightEncoderCount * critical;
-			
-			/*double current0 = pdp.getCurrent(0);
-			double current1 = pdp.getCurrent(1);
-			double current14 = pdp.getCurrent(14);
-			double current15 = pdp.getCurrent(15);*/
 			
 			if (leftEncoderDistance < distance && rightEncoderDistance < distance && (gyro.getAngle() <= 1.5 && gyro.getAngle() >= -1.5))
 			{
@@ -85,14 +96,10 @@ public class Drivetrain extends Subsystem {
 			}
 			else {
 				i = false;
-			}
-			/*else if (current0 > 15 || current1 > 15 || current14 > 15 || current15 > 15)
-			{
-				i = false;
-			}*/			
+			}		
 		}
 		myDrive.drive(0, 0);
-		t.stop();
+		t.stop();*/
 	}
 	public void driveBackwardDistance(int distance) {
 		
@@ -196,6 +203,10 @@ public class Drivetrain extends Subsystem {
 	public void rotate(int degrees) {
 		//t.reset();
 		//t.start();
+		leftFrontPID = new PIDController(0.02, 0.0, 0.0, gyro, leftFrontSC); //.00005
+		leftRearPID = new PIDController(0.02, 0.0, 0.0, gyro, leftRearSC);
+		rightFrontPID = new PIDController(0.02, 0.0, 0.0, gyro, rightFrontSC);
+		rightRearPID = new PIDController(0.02, 0.0, 0.0, gyro, rightRearSC);
 		gyro.reset();
 		leftFrontPID.setOutputRange(-1.0, 1.0);
 		leftRearPID.setOutputRange(-1.0, 1.0);
