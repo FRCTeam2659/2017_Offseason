@@ -1,10 +1,15 @@
 
 package org.usfirst.frc.team2659.robot;
 
+import org.usfirst.frc.team2659.robot.util.SCWrapper;
+import org.usfirst.frc.team2659.robot.util.encoderWrapper;
+
 import com.ctre.CANTalon;
 
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
@@ -31,6 +36,8 @@ public class RobotMap {
 	public static PIDController leftFrontPID;
 	public static PIDController leftRearPID;
 	
+	public static SCWrapper drivetrainLeft, drivetrainRight;
+	
     public static DoubleSolenoid intakeCylinder;
     public static DoubleSolenoid shiftCylinder;
     
@@ -39,61 +46,70 @@ public class RobotMap {
     public static Encoder rightEncoder;
     public static ADXRS450_Gyro gyro;
     
+    public static encoderWrapper leftRateEncoder;
+    public static encoderWrapper rightRateEncoder;
     
+    public static UsbCamera boilerCamera;
+    
+    public final static int ROBOT_WIDTH = 25;
     
     public static void init() {
     	pdp = new PowerDistributionPanel();
     	
     	leftFrontSC = new CANTalon(2);
     	leftFrontSC.setInverted(true);
-    	LiveWindow.addActuator("Drivetrain", "Left Front", (CANTalon) leftFrontSC);
     	
     	leftRearSC = new CANTalon(3);
-    	LiveWindow.addActuator("Drivetrain", "Left Rear", (CANTalon) leftRearSC);
     	leftRearSC.setInverted(true);
     	
     	rightFrontSC = new CANTalon(0);
     	rightFrontSC.setInverted(true);
-    	LiveWindow.addActuator("Drivetrain", "Right Front", (CANTalon) rightFrontSC);
     	
     	rightRearSC = new CANTalon(1);
     	rightRearSC.setInverted(true);
-    	LiveWindow.addActuator("Drivetrain", "Right Rear", (CANTalon) rightRearSC);
     	
-    	myRobot = new RobotDrive(leftFrontSC, leftRearSC, rightFrontSC, rightRearSC);
+    	drivetrainLeft = new SCWrapper(leftFrontSC, leftRearSC);
+    	drivetrainRight = new SCWrapper(rightFrontSC, rightRearSC);
+    	
+    	myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);
     	
     	climberSC = new VictorSP(4);
-    	LiveWindow.addActuator("Climber", "Motors", (VictorSP) climberSC);
     	   	
     	intakeSC = new VictorSP(5);
-    	LiveWindow.addActuator("Intake", "Main", (VictorSP) intakeSC);
     	
     	intakeCylinder = new DoubleSolenoid(0, 1);
-    	LiveWindow.addActuator("Intake", "Actuate Cylinders", (DoubleSolenoid) intakeCylinder);
-    	
+   	
     	shiftCylinder = new DoubleSolenoid(2, 3);
-    	LiveWindow.addActuator("Drivetrain", "Shift Cylinders", (DoubleSolenoid) shiftCylinder);
-    	
+	
     	gearSensor = new AnalogInput(3);
     	LiveWindow.addSensor("Intake", "Proxy Sensor", (AnalogInput) gearSensor);
     	
     	leftEncoder = new Encoder(0,1,false);
-    	leftEncoder.setDistancePerPulse(3.2*Math.PI/256);
+    	leftEncoder.setDistancePerPulse(3.15*Math.PI/256);
+    	leftEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
     	LiveWindow.addSensor("Drivetrain", "Left Encoder", (Encoder) leftEncoder);
     	
     	rightEncoder = new Encoder(2,3,false);
-    	rightEncoder.setDistancePerPulse(3.2*Math.PI/256);
+    	rightEncoder.setDistancePerPulse(3.15*Math.PI/256);
+    	rightEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
     	LiveWindow.addSensor("Drivetrain", "Right Encoder", (Encoder) rightEncoder);
     	
-    	/*gyro = new ADXRS450_Gyro();
+    	leftRateEncoder = new encoderWrapper(leftEncoder, PIDSourceType.kRate);
+    	rightRateEncoder = new encoderWrapper(rightEncoder, PIDSourceType.kRate);
+    	
+    	gyro = new ADXRS450_Gyro();
     	gyro.setPIDSourceType(PIDSourceType.kDisplacement);
     	gyro.calibrate();
-    	gyro.reset();*/
+    	gyro.reset();
+    	
+    boilerCamera = CameraServer.getInstance().startAutomaticCapture(0);
+    boilerCamera.setExposureAuto();
+    	boilerCamera.setResolution(640, 480);
     }
     public static void periodic() {
     	SmartDashboard.putNumber("Left Encoder", leftEncoder.get());
     	SmartDashboard.putNumber("Right Encoder", -rightEncoder.get());
-    	//SmartDashboard.putNumber("gyro", gyro.getAngle());
+    	SmartDashboard.putNumber("gyro", gyro.getAngle());
     	//SmartDashboard.putNumber("pdp 0", pdp.getCurrent(0));
     	//SmartDashboard.putNumber("pdp 1", pdp.getCurrent(1));
     	//SmartDashboard.putNumber("pdp 14", pdp.getCurrent(14));

@@ -59,12 +59,12 @@ public class GearIntake extends Subsystem {
 		    	i = false;
     		}
 	    	if (t.get() > 0.15 && t.get() < 0.4) {
-	    		myDrive.drive(0.5, 0);
+	    		myDrive.drive(-0.5, 0);
 	    		cylinder.set(DoubleSolenoid.Value.kReverse);
 	    	}
 	    	if (t.get() >= 0.4) {
 	    		t.stop();
-	    		myDrive.drive(0.5, 0);
+	    		myDrive.drive(-0.5, 0);
 	    		cylinder.set(DoubleSolenoid.Value.kForward);
 	    	}
     }

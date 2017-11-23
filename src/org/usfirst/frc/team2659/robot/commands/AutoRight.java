@@ -18,19 +18,25 @@ public class AutoRight extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	//Robot.drivetrain.shiftLow();
-    	//Robot.drivetrain.driveForwardDistance(71);
-    	Robot.drivetrain.rotate(180);
-    	setTimeout(10);
-    	//Robot.drivetrain.driveForwardDistance(86);
-    	/*Timer t = new Timer();
+    	setTimeout(15);
+    Robot.drivetrain.shiftLow();
+    Robot.drivetrain.driveForwardDistance(71);
+    	Timer.delay(2.5);
+    Robot.drivetrain.stop();
+    	Robot.drivetrain.rotate(60);
+    	Timer.delay(1);
+    	Robot.drivetrain.stop();
+    Robot.drivetrain.driveForwardDistance(86);
+    Timer.delay(2.5);
+    Robot.drivetrain.stop();
+    	Timer t = new Timer();
     	t.start();
-    	Timer.delay(0.4);
     	while (t.get() < 2) {
     		Robot.intake.scoreGearAuto();
-    	}*/
-    	//Robot.intake.stop();
-    	//Robot.drivetrain.stop();
+    	}
+    
+    	Robot.intake.stop();
+    	Robot.drivetrain.stop();
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -45,6 +51,7 @@ public class AutoRight extends Command {
     // Called once after isFinished returns true
     protected void end() {
     	Robot.drivetrain.stop();
+    	Robot.intake.stop();
     }
 
     // Called when another command which requires one or more of the same

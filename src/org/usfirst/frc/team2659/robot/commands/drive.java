@@ -23,7 +23,7 @@ public class drive extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.drivetrain.warriorDrive(Robot.oi.driveStick.getY(), Robot.oi.driveStick.getZ()/1.57);
+		Robot.drivetrain.warriorDrive(Robot.oi.driveStick.getY(), Robot.oi.driveStick.getX());
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
