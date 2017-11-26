@@ -22,7 +22,26 @@ public class AutoLeft extends Command {
     	//Robot.drivetrain.setVelocity(20, 30);
     setTimeout(4);
     Robot.drivetrain.curveDrive(100, 0);
-    /*	Robot.drivetrain.driveForwardDistance(71);
+    /*	
+     * Robot.drivetrain.shiftLow();
+    Robot.drivetrain.driveForwardDistance(71);
+    	Timer.delay(2.5);
+    Robot.drivetrain.stop();
+    	Robot.drivetrain.rotate(60);
+    	Timer.delay(1);
+    	Robot.drivetrain.stop();
+    Robot.drivetrain.driveForwardDistance(86);
+    Timer.delay(2.5);
+    Robot.drivetrain.stop();
+    	Timer t = new Timer();
+    	t.start();
+    	while (t.get() < 2) {
+    		Robot.intake.scoreGearAuto();
+    	}
+    
+    	Robot.intake.stop();
+    	Robot.drivetrain.stop();
+     * Robot.drivetrain.driveForwardDistance(71);
     	Robot.drivetrain.rotate(-60);
     	Robot.drivetrain.driveForwardDistance(86);
     	Timer t = new Timer();

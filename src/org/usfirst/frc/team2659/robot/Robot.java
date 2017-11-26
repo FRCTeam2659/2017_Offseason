@@ -2,13 +2,13 @@
 package org.usfirst.frc.team2659.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.usfirst.frc.team2659.robot.commands.*;
+import org.usfirst.frc.team2659.robot.commands.commandGroup.*;
 import org.usfirst.frc.team2659.robot.subsystems.*;
 
 
@@ -26,17 +26,7 @@ public class Robot extends IterativeRobot {
     public static Climber climber;
     public static GearIntake intake;
     
-   /* private static final int IMG_WIDTH = 640;
-	private static final int IMG_HEIGHT = 480;
-	
-	private VisionThread visionThread;
-	private double centerX = 0.0;
-	
-	
-	private final Object imgLock = new Object();*/
-
-    Command autonomousCommand;
-	SendableChooser<Command> autoChooser;
+	private static SendableChooser<CommandGroup> autoChooser = new SendableChooser<CommandGroup>();
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -53,45 +43,11 @@ public class Robot extends IterativeRobot {
 		intake = new GearIntake();
 		
 		oi = new OI();	
-		
-		autoChooser = new SendableChooser<Command>();
-		autoChooser.addDefault("Auto 1 - Straight Gear", new AutoStraight());
-		autoChooser.addObject("Auto 2 - Right Gear", new AutoRight());
-		autoChooser.addObject("Auto 3 - Left Gear", new AutoLeft());
-		SmartDashboard.putData("Autonomous chooser", autoChooser);
-		
-		/*new Thread(() -> {
-	        UsbCamera camera = CameraServer.getInstance().startAutomaticCapture("aim", 0);
-	            camera.setResolution(640, 480);
-			}).start();
-		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-	    camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
-	    
-	    visionThread = new VisionThread(camera, new GripPipeline(), pipeline -> {
-	        if (!pipeline.filterContoursOutput().isEmpty()) {
-	            Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
-	       
-	            ArrayList<MatOfPoint> result = pipeline.filterContoursOutput();
-	            synchronized (imgLock) {
-	                ArrayList<Point> center = new ArrayList<Point>();
-		        		for (int i = 0; i < result.size(); i++) {
-		        			r = Imgproc.boundingRect(result.get(i));
-		        			centerX = r.x + r.width / 2;
-		        			center.add(new Point(centerX, 0));
-		        		}
-		        		centerX = 0;
-		        		
-		        		for (int i = 0; i < center.size(); i++) {
-		            		centerX += center.get(i).x;
-		            		
-		            	}
-		            	centerX /= center.size();
-		    
-	            }
-	            
-	        }
-	    });
-	    visionThread.start();*/
+
+		autoChooser.addObject("Auto drive() method", new AutoRight1());
+		autoChooser.addObject("Auto cheatyDrive() method", new AutoRight());
+		autoChooser.addObject("Auto velocity method", new AutoLeft2());
+		SmartDashboard.putData("AUTO", autoChooser);
 	}
 
 	/**
@@ -123,8 +79,11 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		//autonomousCommand = new AutoStraight();
-		autonomousCommand = (Command) autoChooser.getSelected();
-		autonomousCommand.start();
+		drivetrain.zeroSensors();
+		//autonomousCommand = (Command) autoChooser.getSelected();
+		//autonomousCommand.start();
+		Scheduler.getInstance().enable();
+		Scheduler.getInstance().add((CommandGroup) autoChooser.getSelected());
 	}
 
 	/**
@@ -137,8 +96,7 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopInit() {
-		if (autonomousCommand != null)
-			autonomousCommand.cancel();
+		Scheduler.getInstance().enable();
 	}
 
 	/**
@@ -148,12 +106,6 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
 		RobotMap.periodic();
-		/*double centerX;
-	    synchronized (imgLock) {
-	        centerX = this.centerX;
-	    }
-	    double turn = centerX - (IMG_WIDTH / 2);
-	    SmartDashboard.putNumber("rotate value", turn);*/
 	}
 
 	/**

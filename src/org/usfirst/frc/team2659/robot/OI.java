@@ -32,7 +32,7 @@ public class OI {
 		driveStick = new Joystick(0);
 		operatorStick = new Joystick(1);
 		
-		/*operatorButton3 = new JoystickButton(operatorStick, 2);
+		operatorButton3 = new JoystickButton(driveStick, 2);
 		operatorButton3.whileHeld(new GearIntakeOut());
 		
 		operatorButton1 = new JoystickButton(operatorStick, 3);
@@ -44,20 +44,20 @@ public class OI {
 		operatorButton4 = new JoystickButton(operatorStick, 4);
 		operatorButton4.whileHeld(new GearIntakeUp());
 		
-		/*operatorButton5 = new JoystickButton(operatorStick, 6);
+		operatorButton5 = new JoystickButton(operatorStick, 6);
 		operatorButton5.whileHeld(new GearOutakeAuto());
 		operatorButton5.whenReleased(new stopIntake());
 		
-		operatorButton7 = new JoystickButton(operatorStick, 5);
+		operatorButton7 = new JoystickButton(driveStick, 1);//5
 		operatorButton7.whileHeld(new GearIntakeAuto());
 		operatorButton7.whenReleased(new GearIntakeUp());
 		
-		operatorButton8 = new JoystickButton(operatorStick, 6);
+		operatorButton8 = new JoystickButton(driveStick, 4);//6
 		operatorButton8.whileHeld(new ScoreGear());
 		operatorButton8.whenReleased(new stopIntake());
 		
 		operatorButton5 = new JoystickButton(operatorStick, 7);
-		operatorButton5.whileHeld(new climb());*/
+		operatorButton5.whileHeld(new climb());
 		
 		driveButton2 = new JoystickButton(driveStick, 7);
 		driveButton2.whileHeld(new shiftLow());

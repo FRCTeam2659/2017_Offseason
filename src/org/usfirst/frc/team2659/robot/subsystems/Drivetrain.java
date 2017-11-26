@@ -73,23 +73,25 @@ public class Drivetrain extends Subsystem {
 		rightDisPID.setSources(rightEncoder);
 		rightDisPID.setOutputs(drivetrainRight);
 		
-		leftRotatePID.setPID(0.02, 0.0, 0.0006);
+		leftRotatePID.setPID(0.02, 0.005, 0.3);
 		leftRotatePID.setSources(gyro);
 		leftRotatePID.setOutputs(drivetrainLeft);
 		leftRotatePID.setContinuous(false);
-		rightRotatePID.setPID(0.02, 0.0, 0.0006);
+		rightRotatePID.setPID(0.02, 0.005, 0.3);
 		rightRotatePID.setSources(gyro);
 		rightRotatePID.setOutputs(drivetrainRight);
 		rightRotatePID.setContinuous(false);
 		
-		leftVelPID.setPID(0.15, 0.012, 0.0);
+		leftVelPID.setPID(0.2, 0.0, 0.0);
 		leftVelPID.setSources(leftRateEncoder);
 		leftVelPID.setOutputs(drivetrainLeft);
-		leftVelPID.setOutputRange(-0.4, 0.4);
-		rightVelPID.setPID(0.15, 0.012, 0.0);
+		leftVelPID.setContinuous(false);
+		leftVelPID.setOutputRange(0, 1);
+		rightVelPID.setPID(0.2, 0.0, 0.0);
 		rightVelPID.setSources(rightRateEncoder);
 		rightVelPID.setOutputs(drivetrainRight);
-		rightVelPID.setOutputRange(-0.4, 0.4);
+		leftVelPID.setContinuous(false);
+		rightVelPID.setOutputRange(-1, 0);
 		
 		rotatePID.setPID(2, 0, 0.02);
 		rotatePID.setSources(gyro);
@@ -147,7 +149,7 @@ public class Drivetrain extends Subsystem {
 	    	}
 	    	else {
 	    		angle = Math.atan((centerX-320)/320*Math.tan(Math.PI/6))/Math.PI*180;
-	    		angle += 1.5;
+	    		//angle += 1;
 	    		SmartDashboard.putNumber("angle", angle);
 	    		return angle;
 	    	}
@@ -179,37 +181,55 @@ public class Drivetrain extends Subsystem {
 			
 	}
 	
-	public void curve1Drive(double distance, double r) {
+	public boolean curve1Drive(double distance, double r, double tolerance) {
 		rightDisPID.setOutputs(rightdummy);
 		rightDisPID.setOutputRange(-1, 1);
 		rightDisPID.setSetpoint(-distance);
+		rightDisPID.setAbsoluteTolerance(tolerance);
 		rightDisPID.enable();
 		double curve = Math.pow(Math.E, -r/RobotMap.ROBOT_WIDTH);
-		myDrive.drive(-rightdummy.getOutput(), curve);
+		if (rightDisPID.isOnTarget())
+			return true;
+		else {
+			myDrive.drive(-rightdummy.getOutput(), curve);
+			return false;
+		}
+	}
+	
+	public boolean curveVelDrive(double setpoint, double abs_dis_tolerance) {
+		return (leftEncoder.getDistance() - rightEncoder.getDistance()) / 2 > setpoint - abs_dis_tolerance;
 	}
 	
 	public void setVelocity(double left, double right) {
 		rightVelPID.enable();
 		leftVelPID.enable();
 		leftVelPID.setSetpoint(left);
-		rightVelPID.setSetpoint(-right);
-		
+		rightVelPID.setSetpoint(-right);	
 	}
-	
-	public void driveForwardDistance(double distance) {
-		leftEncoder.reset();
-		rightEncoder.reset();
-		
+	public boolean driveTo(double distance, double tolerance) {
 		leftDisPID.setSetpoint(distance);
+		rightDisPID.setOutputs(drivetrainRight);
 	    	rightDisPID.setSetpoint(-distance);
-
+	    	leftDisPID.setAbsoluteTolerance(tolerance);
+	    	rightDisPID.setAbsoluteTolerance(tolerance);
 	    	leftDisPID.enable();
 	    	rightDisPID.enable();
 		
-		/*gyro.reset();
-		t.reset();
-		t.start();	
+	    	return (leftDisPID.isOnTarget() && rightDisPID.isOnTarget());
+	}
+	public boolean turnTo(double angle, double tolerance) {
+		leftRotatePID.setSetpoint(angle);
+		rightDisPID.setSetpoint(0);
+		//rightRotatePID.setSetpoint(angle);
+		leftRotatePID.setAbsoluteTolerance(tolerance);
+		//rightRotatePID.setAbsoluteTolerance(tolerance);
+		leftRotatePID.enable();
+		rightDisPID.enable();
+		//rightRotatePID.enable();
 		
+		return leftRotatePID.isOnTarget();
+	}
+	public boolean driveForwardDistance(double distance) {
 		boolean i = true;
 		while (i) 
 		{		
@@ -220,23 +240,23 @@ public class Drivetrain extends Subsystem {
 			
 			if (leftEncoderDistance < distance && rightEncoderDistance < distance && (gyro.getAngle() <= 1.5 && gyro.getAngle() >= -1.5))
 			{
-				myDrive.drive(-0.5, 0);
+				myDrive.drive(1, 0);
 			}
 			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() > 1) {
-				myDrive.drive(-0.5, -0.1);
+				myDrive.drive(1, -0.1);
 			}
 			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() < -1) {
-				myDrive.drive(-0.5, 0.1);
+				myDrive.drive(1, 0.1);
 			}
-			else if (t.get() > 6) {
-				i = false;
-			}
+			//else if (t.get() > 6) {
+				//i = false;
+			//}
 			else {
 				i = false;
 			}		
 		}
-		myDrive.drive(0, 0);
-		t.stop();*/
+		//myDrive.drive(0, 0);
+		return true;
 	}
 	public void driveBackwardDistance(int distance) {
 		
@@ -257,13 +277,13 @@ public class Drivetrain extends Subsystem {
 
 			if (leftEncoderDistance < distance && rightEncoderDistance < distance && (gyro.getAngle() <= 1 && gyro.getAngle() >= -1))
 			{
-				myDrive.drive(0.8, 0);
+				myDrive.drive(1, 0);
 			}
 			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() > 1) {
-				myDrive.drive(0.8, 0.1);
+				myDrive.drive(1, 0.1);
 			}
 			else if (leftEncoderDistance < distance && rightEncoderDistance < distance && gyro.getAngle() < -1) {
-				myDrive.drive(0.8, -0.1);
+				myDrive.drive(1, -0.1);
 			}
 			else if (t.get() > 4) {
 				i = false;
@@ -383,6 +403,12 @@ public class Drivetrain extends Subsystem {
 		myDrive.arcadeDrive(-y, -z);
 	}
 	
+	public void zeroSensors() {
+		leftEncoder.reset();
+		rightEncoder.reset();
+		gyro.reset();
+	}
+	
 	public void stop() {
 		leftDisPID.disable();
 		rightDisPID.disable();
@@ -391,6 +417,6 @@ public class Drivetrain extends Subsystem {
 		leftRotatePID.disable();
 		rightRotatePID.disable();
 		rotatePID.disable();
-		myDrive.drive(0,0);
+		//myDrive.drive(0,0);
 	}
 }

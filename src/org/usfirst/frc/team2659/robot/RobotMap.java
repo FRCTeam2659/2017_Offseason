@@ -107,8 +107,8 @@ public class RobotMap {
     	boilerCamera.setResolution(640, 480);
     }
     public static void periodic() {
-    	SmartDashboard.putNumber("Left Encoder", leftEncoder.get());
-    	SmartDashboard.putNumber("Right Encoder", -rightEncoder.get());
+    	SmartDashboard.putNumber("Left Encoder", leftEncoder.getDistance());
+    	SmartDashboard.putNumber("Right Encoder", -rightEncoder.getDistance());
     	SmartDashboard.putNumber("gyro", gyro.getAngle());
     	//SmartDashboard.putNumber("pdp 0", pdp.getCurrent(0));
     	//SmartDashboard.putNumber("pdp 1", pdp.getCurrent(1));
