@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
@@ -52,8 +53,8 @@ public class Drivetrain extends Subsystem {
 	warriorPID rightDisPID = new warriorPID();
 	warriorPID leftRotatePID = new warriorPID();
 	warriorPID rightRotatePID = new warriorPID();
-	warriorPID leftVelPID = new warriorPID();
-	warriorPID rightVelPID = new warriorPID();
+	PIDController leftVelPID = new PIDController(0.15, 0.0, 0.0, leftRateEncoder, drivetrainLeft, 0.025);
+	PIDController rightVelPID = new PIDController(0.15, 0.0, 0.0, rightRateEncoder, drivetrainRight, 0.025);
 	warriorPID rotatePID = new warriorPID();
 	rampRate leftVelRamp;
 	rampRate rightVelRamp;
@@ -82,14 +83,14 @@ public class Drivetrain extends Subsystem {
 		rightRotatePID.setOutputs(drivetrainRight);
 		rightRotatePID.setContinuous(false);
 		
-		leftVelPID.setPID(0.2, 0.0, 0.0);
+		/*leftVelPID.setPID(0.15, 0.0, 0.0);
 		leftVelPID.setSources(leftRateEncoder);
-		leftVelPID.setOutputs(drivetrainLeft);
+		leftVelPID.setOutputs(drivetrainLeft);*/
 		leftVelPID.setContinuous(false);
 		leftVelPID.setOutputRange(0, 1);
-		rightVelPID.setPID(0.2, 0.0, 0.0);
+		/*rightVelPID.setPID(0.15, 0.0, 0.0);
 		rightVelPID.setSources(rightRateEncoder);
-		rightVelPID.setOutputs(drivetrainRight);
+		rightVelPID.setOutputs(drivetrainRight);*/
 		leftVelPID.setContinuous(false);
 		rightVelPID.setOutputRange(-1, 0);
 		
@@ -110,7 +111,6 @@ public class Drivetrain extends Subsystem {
 	}
 	
     public double aim() {
-    		
 	    	CvSink sink = CameraServer.getInstance().getVideo(RobotMap.boilerCamera);
 	    	Mat frame = new Mat();
 	    	sink.grabFrameNoTimeout(frame);
@@ -126,9 +126,14 @@ public class Drivetrain extends Subsystem {
 	    	else {
 	    		for (int i = 0; i < result.size(); i++) {
 	    			Rect r = Imgproc.boundingRect(result.get(i));
-	    			centerX = r.x + r.width / 2;
-	    			centerY = r.y + r.height / 2;
-	    			center.add(new Point(centerX, centerY));
+	    			
+	    			if (r.width/r.height < 5 && r.width/r.height > 3) {
+	    				SmartDashboard.putNumber("width" + i, r.width);
+		    			SmartDashboard.putNumber("height" + i, r.height);
+		    			centerX = r.x + r.width / 2;
+		    			centerY = r.y + r.height / 2;
+		    			center.add(new Point(centerX, centerY));
+	    			}
 	    		}
 	    	}
 	    SmartDashboard.putNumber("goal_center", center.get(0).x);
@@ -400,7 +405,12 @@ public class Drivetrain extends Subsystem {
 	}
 	
 	public void warriorDrive(double y, double z) {
-		myDrive.arcadeDrive(-y, -z);
+		double crap;
+		if (z < 0)
+			crap = Math.pow(z, 2);
+		else 
+			crap = -Math.pow(z, 2);
+		myDrive.arcadeDrive(-y, crap);
 	}
 	
 	public void zeroSensors() {

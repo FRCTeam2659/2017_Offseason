@@ -103,7 +103,7 @@ public class RobotMap {
     	gyro.reset();
     	
     boilerCamera = CameraServer.getInstance().startAutomaticCapture(0);
-    boilerCamera.setExposureAuto();
+    boilerCamera.setExposureManual(40);
     	boilerCamera.setResolution(640, 480);
     }
     public static void periodic() {

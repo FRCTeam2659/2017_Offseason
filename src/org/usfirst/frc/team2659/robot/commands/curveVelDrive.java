@@ -12,11 +12,13 @@ public class curveVelDrive extends Command {
 	private double tolerance;
 	private double SP;
 	private boolean finished;
-    public curveVelDrive(double leftVel, double rightVel, double disSetpoint, double tolerance) {
+	private boolean stop;
+    public curveVelDrive(double leftVel, double rightVel, double disSetpoint, double tolerance, boolean stop) {
         this.leftVel = leftVel;
         this.rightVel = rightVel;
         this.SP = disSetpoint;
     		this.tolerance = tolerance;
+    		this.stop = stop;
         requires(Robot.drivetrain);
     }
 
@@ -39,7 +41,8 @@ public class curveVelDrive extends Command {
     // Called once after isFinished returns true
     protected void end() {
     		Robot.drivetrain.zeroSensors();
-    		Robot.drivetrain.stop();	
+    		if (stop)
+    			Robot.drivetrain.stop();	
     }
 
     // Called when another command which requires one or more of the same

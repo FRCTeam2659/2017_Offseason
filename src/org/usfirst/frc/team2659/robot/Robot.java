@@ -2,6 +2,7 @@
 package org.usfirst.frc.team2659.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -10,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team2659.robot.commands.commandGroup.*;
 import org.usfirst.frc.team2659.robot.subsystems.*;
+import org.usfirst.frc.team2659.robot.util.CsvLogger;
 
 
 /**
@@ -48,6 +50,8 @@ public class Robot extends IterativeRobot {
 		autoChooser.addObject("Auto cheatyDrive() method", new AutoRight());
 		autoChooser.addObject("Auto velocity method", new AutoLeft2());
 		SmartDashboard.putData("AUTO", autoChooser);
+		
+		initLoggingChannels();
 	}
 
 	/**
@@ -82,6 +86,7 @@ public class Robot extends IterativeRobot {
 		drivetrain.zeroSensors();
 		//autonomousCommand = (Command) autoChooser.getSelected();
 		//autonomousCommand.start();
+		CsvLogger.init();
 		Scheduler.getInstance().enable();
 		Scheduler.getInstance().add((CommandGroup) autoChooser.getSelected());
 	}
@@ -92,11 +97,13 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
+		CsvLogger.logData(false);
 	}
 
 	@Override
 	public void teleopInit() {
 		Scheduler.getInstance().enable();
+		CsvLogger.init();
 	}
 
 	/**
@@ -106,8 +113,13 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
 		RobotMap.periodic();
+		CsvLogger.logData(false);
 	}
-
+	
+	public void initLoggingChannels() {
+		CsvLogger.addLoggingFieldDouble("TIME", "sec", "getFPGATimestamp", Timer.class);
+		CsvLogger.preCacheAllMethods();
+	}
 	/**
 	 * This function is called periodically during test mode
 	 */
