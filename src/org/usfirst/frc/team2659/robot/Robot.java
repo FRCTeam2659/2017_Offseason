@@ -2,6 +2,7 @@
 package org.usfirst.frc.team2659.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team2659.robot.commands.commandGroup.*;
 import org.usfirst.frc.team2659.robot.subsystems.*;
 import org.usfirst.frc.team2659.robot.util.CsvLogger;
+import org.usfirst.frc.team2659.robot.util.TortoDriveHelper;
 
 
 /**
@@ -27,9 +29,10 @@ public class Robot extends IterativeRobot {
 	public static Drivetrain drivetrain;
     public static Climber climber;
     public static GearIntake intake;
-    
+    public static PowerDistributionPanel pdp = new PowerDistributionPanel();
+    private TortoDriveHelper myDrive = new TortoDriveHelper();
 	private static SendableChooser<CommandGroup> autoChooser = new SendableChooser<CommandGroup>();
-
+	
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -84,9 +87,10 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		//autonomousCommand = new AutoStraight();
 		drivetrain.zeroSensors();
+		RobotMap.gyro.calibrate();
 		//autonomousCommand = (Command) autoChooser.getSelected();
 		//autonomousCommand.start();
-		CsvLogger.init();
+		//CsvLogger.init();
 		Scheduler.getInstance().enable();
 		Scheduler.getInstance().add((CommandGroup) autoChooser.getSelected());
 	}
@@ -97,7 +101,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
-		CsvLogger.logData(false);
+		//CsvLogger.logData(false);
 	}
 
 	@Override
@@ -113,11 +117,17 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
 		RobotMap.periodic();
-		CsvLogger.logData(false);
+		double throttle = oi.driveStick.getY();
+		double turn = oi.driveStick.getX();
+		drivetrain.setOpenLoop(myDrive.tortoDrive(throttle, turn, false,
+                true));
+		//CsvLogger.logData(false);
 	}
 	
 	public void initLoggingChannels() {
 		CsvLogger.addLoggingFieldDouble("TIME", "sec", "getFPGATimestamp", Timer.class);
+		CsvLogger.addLoggingFieldDouble("left_velocity", "in/s", "getRate", RobotMap.leftEncoder);
+		CsvLogger.addLoggingFieldDouble("right_velocity", "in/s", "getRate", RobotMap.rightEncoder);
 		CsvLogger.preCacheAllMethods();
 	}
 	/**

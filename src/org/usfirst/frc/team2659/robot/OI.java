@@ -18,6 +18,7 @@ public class OI {
 	public Button driveButton1;
 	public Button driveButton2;
 	public Button driveButton3;
+	public Button driveButton10;
 	
 	public Button operatorButton1;
 	public Button operatorButton2;
@@ -67,6 +68,9 @@ public class OI {
 		
 		driveButton3 = new JoystickButton(driveStick, 3);
 		driveButton3.whenPressed(new aim());
+		
+		driveButton10 = new JoystickButton(driveStick, 10);
+		driveButton10.whenPressed(new AutoStraight());
 	}
 	 
 	public Joystick getjoystick() {

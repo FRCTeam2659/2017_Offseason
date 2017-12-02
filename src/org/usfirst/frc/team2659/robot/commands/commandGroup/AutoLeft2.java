@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 public class AutoLeft2 extends CommandGroup {
 	public AutoLeft2() {
 		addSequential(new curveVelDrive(75, 75, 35, 0.25, false));
-		addSequential(new curveVelDrive(40, 75, 55, 0.25, true));
+		addSequential(new curveVelDrive(40, 65, 50, 0.25, true));
 		addSequential(new driveTo(25, 0.5));
 		//addSequential(new ScoreGear());
 	}

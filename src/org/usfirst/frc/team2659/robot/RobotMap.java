@@ -56,7 +56,7 @@ public class RobotMap {
     public static void init() {
     	pdp = new PowerDistributionPanel();
     	
-    	leftFrontSC = new CANTalon(2);
+    	/*leftFrontSC = new CANTalon(2);
     	leftFrontSC.setInverted(true);
     	
     	leftRearSC = new CANTalon(3);
@@ -66,12 +66,12 @@ public class RobotMap {
     	rightFrontSC.setInverted(true);
     	
     	rightRearSC = new CANTalon(1);
-    	rightRearSC.setInverted(true);
+    	rightRearSC.setInverted(true);*/
     	
-    	drivetrainLeft = new SCWrapper(leftFrontSC, leftRearSC);
-    	drivetrainRight = new SCWrapper(rightFrontSC, rightRearSC);
+    	//drivetrainLeft = new SCWrapper(leftFrontSC, leftRearSC);
+    	//drivetrainRight = new SCWrapper(rightFrontSC, rightRearSC);
     	
-    	myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);
+    //	myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);
     	
     	climberSC = new VictorSP(4);
     	   	
@@ -87,11 +87,13 @@ public class RobotMap {
     	leftEncoder = new Encoder(0,1,false);
     	leftEncoder.setDistancePerPulse(3.15*Math.PI/256);
     	leftEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
+    leftEncoder.setSamplesToAverage(127);
     	LiveWindow.addSensor("Drivetrain", "Left Encoder", (Encoder) leftEncoder);
     	
     	rightEncoder = new Encoder(2,3,false);
     	rightEncoder.setDistancePerPulse(3.15*Math.PI/256);
     	rightEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
+    rightEncoder.setSamplesToAverage(127);
     	LiveWindow.addSensor("Drivetrain", "Right Encoder", (Encoder) rightEncoder);
     	
     	leftRateEncoder = new encoderWrapper(leftEncoder, PIDSourceType.kRate);
@@ -108,7 +110,7 @@ public class RobotMap {
     }
     public static void periodic() {
     	SmartDashboard.putNumber("Left Encoder", leftEncoder.getDistance());
-    	SmartDashboard.putNumber("Right Encoder", -rightEncoder.getDistance());
+    	SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
     	SmartDashboard.putNumber("gyro", gyro.getAngle());
     	//SmartDashboard.putNumber("pdp 0", pdp.getCurrent(0));
     	//SmartDashboard.putNumber("pdp 1", pdp.getCurrent(1));

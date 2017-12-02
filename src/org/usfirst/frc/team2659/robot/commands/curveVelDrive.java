@@ -25,7 +25,7 @@ public class curveVelDrive extends Command {
     // Called just before this Command runs the first time
     protected void initialize() {
     		setTimeout(5);
-    		Robot.drivetrain.setVelocity(leftVel, rightVel);
+    		Robot.drivetrain.setVelocitySetpoint(leftVel, rightVel);
     }
 
     // Called repeatedly when this Command is scheduled to run

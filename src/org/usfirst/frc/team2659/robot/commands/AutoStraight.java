@@ -12,12 +12,12 @@ public class AutoStraight extends Command {
     public AutoStraight() {
         // Use requires() here to declare subsystem dependencies
        requires(Robot.drivetrain);
-       requires(Robot.intake);
+       //requires(Robot.intake);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	Robot.drivetrain.shiftLow();
+    /*	Robot.drivetrain.shiftLow();
     	Robot.drivetrain.driveForwardDistance(81);
     	Timer.delay(4);
     	Robot.drivetrain.stop();
@@ -27,19 +27,19 @@ public class AutoStraight extends Command {
     		Robot.intake.scoreGearAuto();
     	}
     	Robot.intake.stop();
-    	Robot.drivetrain.stop();
+    	Robot.drivetrain.stop();*/
+    	setTimeout(3);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	
-    	    	
+    		Robot.drivetrain.warriorDrive(-1, 0);
     }
     	
     
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return false;
+        return isTimedOut();
     }
 
     // Called once after isFinished returns true
