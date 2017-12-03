@@ -18,10 +18,10 @@ public class AutoLeft extends Command {
     // Called just before this Command runs the first time
     protected void initialize() {
     
-    	Robot.drivetrain.shiftLow();
+    	//Robot.drivetrain.shiftLow();
     	//Robot.drivetrain.setVelocity(20, 30);
-    setTimeout(4);
-    Robot.drivetrain.curveDrive(100, 0);
+    setTimeout(5);
+    //Robot.drivetrain.curveDrive(100, 0);
     /*	
      * Robot.drivetrain.shiftLow();
     Robot.drivetrain.driveForwardDistance(71);
@@ -52,11 +52,13 @@ public class AutoLeft extends Command {
     	}
     	Robot.intake.stop();
     	Robot.drivetrain.stop();*/
+    //Robot.drivetrain.setWantDrivePath(path, false);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     		//Robot.drivetrain.curve1Drive(97, 80);
+    		
     }
 
     // Make this return true when this Command no longer needs to run execute()

@@ -1,6 +1,7 @@
 
 package org.usfirst.frc.team2659.robot;
 
+import org.usfirst.frc.team2659.robot.util.Rotation2d;
 import org.usfirst.frc.team2659.robot.util.SCWrapper;
 import org.usfirst.frc.team2659.robot.util.encoderWrapper;
 
@@ -107,6 +108,11 @@ public class RobotMap {
     boilerCamera = CameraServer.getInstance().startAutomaticCapture(0);
     boilerCamera.setExposureManual(40);
     	boilerCamera.setResolution(640, 480);
+    }
+    
+    public static Rotation2d getGyroAngle() {
+    		Rotation2d mAngleAdjustment = Rotation2d.identity();
+    		return mAngleAdjustment.rotateBy(Rotation2d.fromDegrees(gyro.getAngle()));
     }
     public static void periodic() {
     	SmartDashboard.putNumber("Left Encoder", leftEncoder.getDistance());

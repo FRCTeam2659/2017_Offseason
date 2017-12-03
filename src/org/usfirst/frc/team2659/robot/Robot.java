@@ -12,7 +12,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team2659.robot.commands.commandGroup.*;
 import org.usfirst.frc.team2659.robot.subsystems.*;
+import org.usfirst.frc.team2659.robot.util.BoilerGear;
 import org.usfirst.frc.team2659.robot.util.CsvLogger;
+import org.usfirst.frc.team2659.robot.util.Path;
+import org.usfirst.frc.team2659.robot.util.PathContainer;
 import org.usfirst.frc.team2659.robot.util.TortoDriveHelper;
 
 
@@ -32,6 +35,8 @@ public class Robot extends IterativeRobot {
     public static PowerDistributionPanel pdp = new PowerDistributionPanel();
     private TortoDriveHelper myDrive = new TortoDriveHelper();
 	private static SendableChooser<CommandGroup> autoChooser = new SendableChooser<CommandGroup>();
+	private PathContainer mPathContainer = new BoilerGear();
+	private Path mPath;
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -88,11 +93,14 @@ public class Robot extends IterativeRobot {
 		//autonomousCommand = new AutoStraight();
 		drivetrain.zeroSensors();
 		RobotMap.gyro.calibrate();
+		mPath = mPathContainer.buildPath();
+		drivetrain.setWantDrivePath(mPath, false);
+		RobotStateEstimator.getInstance().onStart(Timer.getFPGATimestamp());
 		//autonomousCommand = (Command) autoChooser.getSelected();
 		//autonomousCommand.start();
 		//CsvLogger.init();
-		Scheduler.getInstance().enable();
-		Scheduler.getInstance().add((CommandGroup) autoChooser.getSelected());
+		//Scheduler.getInstance().enable();
+		//Scheduler.getInstance().add((CommandGroup) autoChooser.getSelected());
 	}
 
 	/**
@@ -100,8 +108,12 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		Scheduler.getInstance().run();
+		//Scheduler.getInstance().run();
 		//CsvLogger.logData(false);
+		double timestamp = Timer.getFPGATimestamp();
+		RobotStateEstimator.getInstance().onLoop(timestamp);
+		drivetrain.updatePathFollower(timestamp);
+		SmartDashboard.putNumber("timestamp", timestamp);
 	}
 
 	@Override

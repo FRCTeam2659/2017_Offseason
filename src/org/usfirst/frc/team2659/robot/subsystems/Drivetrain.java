@@ -19,11 +19,18 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
+import org.usfirst.frc.team2659.robot.Kinematics;
 import org.usfirst.frc.team2659.robot.RobotMap;
+import org.usfirst.frc.team2659.robot.RobotState;
 import org.usfirst.frc.team2659.robot.util.CANTalonFactory;
 import org.usfirst.frc.team2659.robot.util.DriveSignal;
 import org.usfirst.frc.team2659.robot.util.GripPipeline;
+import org.usfirst.frc.team2659.robot.util.Lookahead;
+import org.usfirst.frc.team2659.robot.util.Path;
+import org.usfirst.frc.team2659.robot.util.PathFollower;
+import org.usfirst.frc.team2659.robot.util.RigidTransform2d;
 import org.usfirst.frc.team2659.robot.util.SCWrapper;
+import org.usfirst.frc.team2659.robot.util.Twist2d;
 import org.usfirst.frc.team2659.robot.util.dummyPIDOutput;
 import org.usfirst.frc.team2659.robot.util.encoderWrapper;
 import org.usfirst.frc.team2659.robot.util.rampRate;
@@ -36,14 +43,16 @@ import com.ctre.CANTalon.VelocityMeasurementPeriod;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.PowerDistributionPanel;
-/**
- *
- */
+
+
 public class Drivetrain extends Subsystem {
-	// Put methods for controlling this subsystem
-	// here. Call these from Commands.
+	
 	private static final int kLowGearPositionControlSlot = 0;
     private static final int kHighGearVelocityControlSlot = 1;
+    
+    private Path mCurrentPath = null;
+    private RobotState mRobotState = RobotState.getInstance();
+    private PathFollower mPathFollower;
 	
 	RobotDrive myDrive = RobotMap.myRobot;
 	SCWrapper drivetrainLeft = RobotMap.drivetrainLeft;
@@ -223,6 +232,34 @@ public class Drivetrain extends Subsystem {
         }
     }
 	
+    public synchronized void setWantDrivePath(Path path, boolean reversed) {
+        if (mCurrentPath != path || mDriveControlState != DriveControlState.PATH_FOLLOWING) {
+            configureTalonsForSpeedControl();
+            RobotState.getInstance().resetDistanceDriven();
+            mPathFollower = new PathFollower(path, reversed,
+                    new PathFollower.Parameters(new Lookahead(12.0, 24.0, 9.0, 80), 0.0, 5.0, 0.03, 0.02, 1.0, 0.05, 80, 120, 0.75, 12.0, 9.0));
+            mDriveControlState = DriveControlState.PATH_FOLLOWING;
+            mCurrentPath = path;
+        } else {
+            setVelocitySetpoint(0, 0);
+        }
+    }
+    
+    /**
+     * Called periodically when the robot is in path following mode. Updates the path follower with the robots latest
+     * pose, distance driven, and velocity, the updates the wheel velocity setpoints.
+     */
+    public void updatePathFollower(double timestamp) {
+        RigidTransform2d robot_pose = mRobotState.getLatestFieldToVehicle().getValue();
+        SmartDashboard.putNumber("robot_pos", RobotState.getInstance().getDistanceDriven());
+        Twist2d command = mPathFollower.update(timestamp, robot_pose, RobotState.getInstance().getDistanceDriven(), RobotState.getInstance().getPredictedVelocity().dx);
+        if (!mPathFollower.isFinished()) {
+            Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
+            setVelocity(setpoint.left, setpoint.right);
+        } else {
+            setVelocity(0, 0);
+        }
+    }
     
 	Timer t = new Timer();
 	private final double critical = 3.15 * 3.141 / 256;
