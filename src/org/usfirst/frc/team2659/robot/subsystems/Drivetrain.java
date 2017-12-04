@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
@@ -47,7 +46,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain extends Subsystem {
 	
-	private static final int kLowGearPositionControlSlot = 0;
     private static final int kHighGearVelocityControlSlot = 1;
     
     private Path mCurrentPath = null;
@@ -65,18 +63,17 @@ public class Drivetrain extends Subsystem {
 	ADXRS450_Gyro gyro = RobotMap.gyro;
 	PWMSpeedController SC = RobotMap.intakeSC;
 	DoubleSolenoid intakeCylinder = RobotMap.intakeCylinder;
-	//PowerDistributionPanel pdp = new PowerDistributionPanel();
 	warriorPID leftDisPID = new warriorPID();
 	warriorPID rightDisPID = new warriorPID();
 	warriorPID leftRotatePID = new warriorPID();
 	warriorPID rightRotatePID = new warriorPID();
-	//PIDController leftVelPID = new PIDController(0.15, 0.0, 0.0, leftRateEncoder, drivetrainLeft, 0.025);
-	//PIDController rightVelPID = new PIDController(0.15, 0.0, 0.0, rightRateEncoder, drivetrainRight, 0.025);
+	warriorPID disPID = new warriorPID();
 	warriorPID rotatePID = new warriorPID();
 	rampRate leftVelRamp;
 	rampRate rightVelRamp;
 	dummyPIDOutput leftdummy = new dummyPIDOutput();
 	dummyPIDOutput rightdummy = new dummyPIDOutput();
+	dummyPIDOutput disdummy = new dummyPIDOutput();
 	dummyPIDOutput rotatedummy = new dummyPIDOutput();
 	
 	GripPipeline vision = new GripPipeline();
@@ -150,18 +147,11 @@ public class Drivetrain extends Subsystem {
 		rightRotatePID.setOutputs(drivetrainRight);
 		rightRotatePID.setContinuous(false);
 		
-		/*leftVelPID.setPID(0.15, 0.0, 0.0);
-		leftVelPID.setSources(leftRateEncoder);
-		leftVelPID.setOutputs(drivetrainLeft);*/
-		//leftVelPID.setContinuous(false);
-		//leftVelPID.setOutputRange(0, 1);
-		/*rightVelPID.setPID(0.15, 0.0, 0.0);
-		rightVelPID.setSources(rightRateEncoder);
-		rightVelPID.setOutputs(drivetrainRight);*/
-		//rightVelPID.setContinuous(false);
-		//rightVelPID.setOutputRange(-1, 0);
-		
-		rotatePID.setPID(2, 0, 0.02);
+		disPID.setPID(2, 0.0, 0.0);
+		disPID.setSources(RobotMap.averageEncoderDistance);
+		disPID.setOutputs(disdummy);
+
+		rotatePID.setPID(1, 0, 0.02);
 		rotatePID.setSources(gyro);
 		rotatePID.setOutputs(rotatedummy);
 		rotatePID.setOutputRange(-10, 10);
@@ -205,11 +195,9 @@ public class Drivetrain extends Subsystem {
     
     public synchronized void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
         configureTalonsForSpeedControl();
-        SmartDashboard.putBoolean("velocity", true);
         mDriveControlState = DriveControlState.VELOCITY_SETPOINT;
         setVelocity(left_inches_per_sec, right_inches_per_sec);
     }
-
     
     private void configureTalonsForSpeedControl() {
         if (!usesTalonVelocityControl(mDriveControlState)) {
@@ -217,15 +205,13 @@ public class Drivetrain extends Subsystem {
             mLeftMaster.changeControlMode(CANTalon.TalonControlMode.Speed);
             mLeftMaster.setNominalClosedLoopVoltage(12.0);
             mLeftMaster.setProfile(kHighGearVelocityControlSlot);
-            mLeftMaster.configNominalOutputVoltage(0.5,
-                    -0.5);
+            mLeftMaster.configNominalOutputVoltage(0.5, -0.5);
             mLeftMaster.setPID(0.22, 0.0, 0.0);
             mLeftMaster.setF(0.1097);
             mRightMaster.changeControlMode(CANTalon.TalonControlMode.Speed);
             mRightMaster.setNominalClosedLoopVoltage(12.0);
             mRightMaster.setProfile(kHighGearVelocityControlSlot);
-            mRightMaster.configNominalOutputVoltage(0.5,
-                    -0.5);
+            mRightMaster.configNominalOutputVoltage(0.5, -0.5);
             mRightMaster.setPID(0.22, 0.0, 0.0);
             mRightMaster.setF(0.1097);
             setBrakeMode(true);
@@ -236,8 +222,7 @@ public class Drivetrain extends Subsystem {
         if (mCurrentPath != path || mDriveControlState != DriveControlState.PATH_FOLLOWING) {
             configureTalonsForSpeedControl();
             RobotState.getInstance().resetDistanceDriven();
-            mPathFollower = new PathFollower(path, reversed,
-                    new PathFollower.Parameters(new Lookahead(12.0, 24.0, 9.0, 80), 0.0, 5.0, 0.03, 0.02, 1.0, 0.05, 80, 120, 0.75, 12.0, 9.0));
+            mPathFollower = new PathFollower(path, reversed, new PathFollower.Parameters(new Lookahead(12.0, 24.0, 9.0, 80), 0.0, 5.0, 0.03, 0.02, 1.0, 0.05, 80, 120, 0.75, 12.0, 9.0));
             mDriveControlState = DriveControlState.PATH_FOLLOWING;
             mCurrentPath = path;
         } else {
@@ -249,16 +234,28 @@ public class Drivetrain extends Subsystem {
      * Called periodically when the robot is in path following mode. Updates the path follower with the robots latest
      * pose, distance driven, and velocity, the updates the wheel velocity setpoints.
      */
-    public void updatePathFollower(double timestamp) {
+    public void updatePathFollower(double timestamp, double sign) {
         RigidTransform2d robot_pose = mRobotState.getLatestFieldToVehicle().getValue();
-        SmartDashboard.putNumber("robot_pos", RobotState.getInstance().getDistanceDriven());
         Twist2d command = mPathFollower.update(timestamp, robot_pose, RobotState.getInstance().getDistanceDriven(), RobotState.getInstance().getPredictedVelocity().dx);
         if (!mPathFollower.isFinished()) {
             Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
-            setVelocity(setpoint.left, setpoint.right);
+            setVelocity(sign*setpoint.left, sign*setpoint.right);
         } else {
             setVelocity(0, 0);
         }
+    }
+    
+    public synchronized boolean isDoneWithPath() {
+        if (mDriveControlState == DriveControlState.PATH_FOLLOWING && mPathFollower != null) {
+            return mPathFollower.isFinished();
+        } else {
+            System.out.println("Robot is not in path following mode");
+            return true;
+        }
+    }
+  
+    public synchronized void setGyroAngle() {
+        gyro.reset();
     }
     
 	Timer t = new Timer();
@@ -320,13 +317,11 @@ public class Drivetrain extends Subsystem {
     }
 	
 	public void curveDrive(double distance, double angle) {
-
-		leftDisPID.setOutputs(leftdummy);
+		leftDisPID.setOutputs(leftdummy); //don't use this!!!
 		leftDisPID.setOutputRange(-1, 1);
 		leftDisPID.setSetpoint(distance);
 		
 		leftDisPID.enable();
-		
 		rotatePID.enable();
 	
 			double percentDone = (leftEncoder.getDistance() + rightEncoder.getDistance())/2/(distance);
@@ -341,8 +336,7 @@ public class Drivetrain extends Subsystem {
 			double rightVelocity = leftdummy.getOutput() - rotatedummy.getOutput();
 			leftVelocity = leftVelRamp.getNextValue(leftVelocity);
 			rightVelocity = rightVelRamp.getNextValue(rightVelocity);
-			setVelocity(leftVelocity, rightVelocity);
-			
+			setVelocity(leftVelocity, rightVelocity);		
 	}
 	
 	public boolean curve1Drive(double distance, double r, double tolerance) {
@@ -365,10 +359,6 @@ public class Drivetrain extends Subsystem {
 	}
 	
 	public void setVelocity(double left, double right) {
-		//rightVelPID.enable();
-		//leftVelPID.enable();
-		//leftVelPID.setSetpoint(left);
-		//rightVelPID.setSetpoint(-right);	
 		if (usesTalonVelocityControl(mDriveControlState)) {
             final double max_desired = Math.max(Math.abs(left), Math.abs(right));
             final double scale = max_desired > 80 ? 80 / max_desired : 1.0;
@@ -382,6 +372,21 @@ public class Drivetrain extends Subsystem {
         }
 	}
 	
+	public synchronized void splineDrive(double distance, double maxSpeed, double angle, double curvature, double tolerance) {
+		configureTalonsForSpeedControl();
+        mDriveControlState = DriveControlState.VELOCITY_SETPOINT;
+        disPID.setSetpoint(distance);
+		disPID.setOutputRange(-maxSpeed, maxSpeed);
+        disPID.enable();
+        
+	}
+	
+	public synchronized void updateSplineDrive(double angle) {
+		double strikeVelocity = disdummy.getOutput();
+		double leftVelocity = strikeVelocity + angle;
+		double rightVelocity = strikeVelocity - angle;
+		setVelocity(leftVelocity, rightVelocity);
+	}
 	
 	private static double inchesPerSecondToRpm(double inches_per_second) {
         return inchesToRotations(inches_per_second) * 60;
@@ -577,8 +582,6 @@ public class Drivetrain extends Subsystem {
 	public void stop() {
 		leftDisPID.disable();
 		rightDisPID.disable();
-		//leftVelPID.disable();
-		//rightVelPID.disable();
 		leftRotatePID.disable();
 		rightRotatePID.disable();
 		rotatePID.disable();

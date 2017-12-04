@@ -1,9 +1,11 @@
 
 package org.usfirst.frc.team2659.robot;
 
+import org.usfirst.frc.team2659.robot.util.MultipleEncoderWrapper;
 import org.usfirst.frc.team2659.robot.util.Rotation2d;
 import org.usfirst.frc.team2659.robot.util.SCWrapper;
 import org.usfirst.frc.team2659.robot.util.encoderWrapper;
+import org.usfirst.frc.team2659.robot.util.MultipleEncoderWrapper.MultipleEncoderWrapperMode;
 
 import com.ctre.CANTalon;
 
@@ -49,6 +51,7 @@ public class RobotMap {
     
     public static encoderWrapper leftRateEncoder;
     public static encoderWrapper rightRateEncoder;
+    public static MultipleEncoderWrapper averageEncoderDistance, averageEncoderRate;
     
     public static UsbCamera boilerCamera;
     
@@ -67,12 +70,12 @@ public class RobotMap {
     	rightFrontSC.setInverted(true);
     	
     	rightRearSC = new CANTalon(1);
-    	rightRearSC.setInverted(true);*/
+    	rightRearSC.setInverted(true);
     	
-    	//drivetrainLeft = new SCWrapper(leftFrontSC, leftRearSC);
-    	//drivetrainRight = new SCWrapper(rightFrontSC, rightRearSC);
+    	drivetrainLeft = new SCWrapper(leftFrontSC, leftRearSC);
+    	drivetrainRight = new SCWrapper(rightFrontSC, rightRearSC);
     	
-    //	myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);
+    myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);*/
     	
     	climberSC = new VictorSP(4);
     	   	
@@ -99,6 +102,7 @@ public class RobotMap {
     	
     	leftRateEncoder = new encoderWrapper(leftEncoder, PIDSourceType.kRate);
     	rightRateEncoder = new encoderWrapper(rightEncoder, PIDSourceType.kRate);
+    	averageEncoderDistance = new MultipleEncoderWrapper(PIDSourceType.kDisplacement, MultipleEncoderWrapperMode.AVERAGE, leftEncoder, rightEncoder);
     	
     	gyro = new ADXRS450_Gyro();
     	gyro.setPIDSourceType(PIDSourceType.kDisplacement);
@@ -112,7 +116,7 @@ public class RobotMap {
     
     public static Rotation2d getGyroAngle() {
     		Rotation2d mAngleAdjustment = Rotation2d.identity();
-    		return mAngleAdjustment.rotateBy(Rotation2d.fromDegrees(gyro.getAngle()));
+    		return mAngleAdjustment.rotateBy(Rotation2d.fromDegrees(-gyro.getAngle()));
     }
     public static void periodic() {
     	SmartDashboard.putNumber("Left Encoder", leftEncoder.getDistance());

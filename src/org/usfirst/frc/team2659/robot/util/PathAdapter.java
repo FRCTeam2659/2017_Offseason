@@ -23,7 +23,7 @@ public class PathAdapter {
     static final Rotation2d kBluePegHeading = Rotation2d.fromDegrees(125);
     static final Rotation2d kRedHopperHeading = Rotation2d.fromDegrees(45); // angle to hit the red hopper at
     static final Rotation2d kBlueHopperHeading = Rotation2d.fromDegrees(315); // angle to hit the blue hopper at
-    static final Rotation2d kStartHeading = Rotation2d.fromDegrees(180); // start angle (backwards)
+    static final Rotation2d kStartHeading = Rotation2d.fromDegrees(0); // start angle (backwards)
     static final double kGearPlacementDist = 20 + 10; // distance away from the
                                                                                          // airship wall to place the
                                                                                          // gear at
@@ -162,7 +162,7 @@ public class PathAdapter {
                 .getTranslation();
     }
 
-    private static Translation2d getBlueGearPosition() {
+    public static Translation2d getBlueGearPosition() {
         Translation2d pegPosition = new Translation2d(kFieldProfile.getBlueWallToAirship() + kPegOffsetX,
                 kFieldHeight / 2 + kPegOffsetY);
         Translation2d robotOffset = new Translation2d(kBluePegHeading.cos() * kGearPlacementDist,
@@ -175,9 +175,10 @@ public class PathAdapter {
     }
 
     public static RigidTransform2d getBlueStartPose() {
-        return new RigidTransform2d(new Translation2d(15,
+    		return new RigidTransform2d(new Translation2d(0,50),kStartHeading);
+        /*return new RigidTransform2d(new Translation2d(15,
                 kFieldHeight / 2 + kFieldProfile.getBlueCenterToBoiler() - 16),
-                kStartHeading);
+                kStartHeading);*/
     }
 
     private static Translation2d getBlueCenterPosition() {

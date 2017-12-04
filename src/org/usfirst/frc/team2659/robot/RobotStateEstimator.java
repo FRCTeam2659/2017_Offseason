@@ -29,7 +29,7 @@ public class RobotStateEstimator {
 	        final Twist2d odometry_velocity = robot_state_.generateOdometryFromSensors(
 	                left_distance - left_encoder_prev_distance_, right_distance - right_encoder_prev_distance_, gyro_angle);
 	        final Twist2d predicted_velocity = Kinematics.forwardKinematics(RobotMap.leftEncoder.getRate(),
-	                RobotMap.rightEncoder.getRate());
+	                -RobotMap.rightEncoder.getRate());
 	        robot_state_.addObservations(timestamp, odometry_velocity, predicted_velocity);
 	        left_encoder_prev_distance_ = left_distance;
 	        right_encoder_prev_distance_ = right_distance;

@@ -15,8 +15,8 @@ public class TortoDriveHelper {
 	    private static final double kLowNegInertiaCloseScalar = 4.0;
 	    private static final double kLowNegInertiaFarScalar = 5.0;
 
-	    private static final double kHighSensitivity = 0.95;
-	    private static final double kLowSensitiity = 1.3;
+	    private static final double kHighSensitivity = 0.9;
+	    private static final double kLowSensitiity = 1.2;
 
 	    private static final double kQuickStopDeadband = 0.2;
 	    private static final double kQuickStopWeight = 0.1;
@@ -26,8 +26,7 @@ public class TortoDriveHelper {
 	    private double mQuickStopAccumlator = 0.0;
 	    private double mNegInertiaAccumlator = 0.0;
 
-	    public DriveSignal tortoDrive(double throttle, double wheel, boolean isQuickTurn,
-	            boolean isHighGear) {
+	    public DriveSignal tortoDrive(double throttle, double wheel, boolean isQuickTurn, boolean isHighGear) {
 
 	        wheel = handleDeadband(wheel, kWheelDeadband);
 	        throttle = handleDeadband(throttle, kThrottleDeadband);
