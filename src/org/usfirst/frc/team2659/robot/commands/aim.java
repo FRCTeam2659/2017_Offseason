@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class aim extends Command {
 	double angle;
+	Command drive = new drive();
     public aim() {
         // Use requires() here to declare subsystem dependencies
         requires(Robot.drivetrain);
@@ -16,8 +17,9 @@ public class aim extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	Robot.drivetrain.rotate(Robot.drivetrain.aim());
-    	setTimeout(5);
+	    	drive.cancel();
+	    	Robot.drivetrain.rotateDistance(Robot.drivetrain.aim());
+	    	setTimeout(5);
     		
     }
 
@@ -35,6 +37,7 @@ public class aim extends Command {
     // Called once after isFinished returns true
     protected void end() {
     		Robot.drivetrain.stop();
+    		drive.start();
     }
 
     // Called when another command which requires one or more of the same
