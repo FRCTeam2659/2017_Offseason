@@ -1,11 +1,11 @@
 package org.usfirst.frc.team2659.robot.util;
 
 public class TortoDriveHelper {
-	 private static final double kThrottleDeadband = 0.02;
-	    private static final double kWheelDeadband = 0.02;
+	 private static final double kThrottleDeadband = 0.05;
+	    private static final double kWheelDeadband = 0.06;
 
 	    // These factor determine how fast the wheel traverses the "non linear" sine curve.
-	    private static final double kHighWheelNonLinearity = 0.65;
+	    private static final double kHighWheelNonLinearity = 0.6; //above 0, 1 is the most curvy
 	    private static final double kLowWheelNonLinearity = 0.5;
 
 	    private static final double kHighNegInertiaScalar = 4.0;
@@ -15,8 +15,8 @@ public class TortoDriveHelper {
 	    private static final double kLowNegInertiaCloseScalar = 4.0;
 	    private static final double kLowNegInertiaFarScalar = 5.0;
 
-	    private static final double kHighSensitivity = 0.9;
-	    private static final double kLowSensitiity = 1.2;
+	    private static final double kHighSensitivity = 0.5;
+	    private static final double kLowSensitiity = 0.7;
 
 	    private static final double kQuickStopDeadband = 0.2;
 	    private static final double kQuickStopWeight = 0.1;
@@ -96,7 +96,7 @@ public class TortoDriveHelper {
 	                        + alpha * Util.limit(wheel, 1.0) * kQuickStopScalar;
 	            }
 	            overPower = 1.0;
-	            angularPower = wheel;
+	            angularPower = wheel * sensitivity;
 	        } else {
 	            overPower = 0.0;
 	            angularPower = Math.abs(throttle) * wheel * sensitivity - mQuickStopAccumlator;
