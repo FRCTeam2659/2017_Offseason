@@ -24,8 +24,9 @@ public class blueGear extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    		RobotStateEstimator.getInstance().onLoop(Timer.getFPGATimestamp());
-    		Robot.drivetrain.updatePathFollower(Timer.getFPGATimestamp(), 1);
+    		double timestamp = Timer.getFPGATimestamp();
+    		RobotStateEstimator.getInstance().onLoop(timestamp);
+    		Robot.drivetrain.updatePathFollower(timestamp, 1);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -36,8 +37,7 @@ public class blueGear extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    		Robot.drivetrain.stop();
-    		SmartDashboard.putBoolean("first", true);
+    		//Robot.drivetrain.stop();
     }
 
     // Called when another command which requires one or more of the same

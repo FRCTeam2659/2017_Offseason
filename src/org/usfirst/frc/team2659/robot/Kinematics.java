@@ -71,7 +71,7 @@ public class Kinematics {
 	        if (Math.abs(velocity.dtheta) < kEpsilon) {
 	            return new DriveVelocity(velocity.dx, velocity.dx);
 	        }
-	        double delta_v = 26 * velocity.dtheta / (2 * 0.924);
+	        double delta_v = 26 * velocity.dtheta / (2 * 1); //add constant here 0.924
 	        return new DriveVelocity(velocity.dx - delta_v, velocity.dx + delta_v);
 	    }
 }

@@ -6,7 +6,7 @@ public class TortoDriveHelper {
 
 	    // These factor determine how fast the wheel traverses the "non linear" sine curve.
 	    private static final double kHighWheelNonLinearity = 0.6; //above 0, 1 is the most curvy
-	    private static final double kLowWheelNonLinearity = 0.5;
+	    private static final double kLowWheelNonLinearity = 0.3;
 
 	    private static final double kHighNegInertiaScalar = 4.0;
 
@@ -16,7 +16,7 @@ public class TortoDriveHelper {
 	    private static final double kLowNegInertiaFarScalar = 5.0;
 
 	    private static final double kHighSensitivity = 0.5;
-	    private static final double kLowSensitiity = 0.7;
+	    private static final double kLowSensitiity = 0.56;
 
 	    private static final double kQuickStopDeadband = 0.2;
 	    private static final double kQuickStopWeight = 0.1;

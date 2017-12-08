@@ -60,7 +60,7 @@ public class RobotMap {
     public static void init() {
     	pdp = new PowerDistributionPanel();
     	
-    	/*leftFrontSC = new CANTalon(2);
+    	leftFrontSC = new CANTalon(2);
     	leftFrontSC.setInverted(true);
     	
     	leftRearSC = new CANTalon(3);
@@ -75,7 +75,7 @@ public class RobotMap {
     	drivetrainLeft = new SCWrapper(leftFrontSC, leftRearSC);
     	drivetrainRight = new SCWrapper(rightFrontSC, rightRearSC);
     	
-    myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);*/
+   /* myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);*/
     	
     	climberSC = new VictorSP(4);
     	   	
@@ -110,13 +110,17 @@ public class RobotMap {
     	gyro.reset();
     	
     boilerCamera = CameraServer.getInstance().startAutomaticCapture(0);
-    boilerCamera.setExposureManual(40);
+    boilerCamera.setExposureManual(8);
     	boilerCamera.setResolution(640, 480);
     }
     
     public static Rotation2d getGyroAngle() {
     		Rotation2d mAngleAdjustment = Rotation2d.identity();
     		return mAngleAdjustment.rotateBy(Rotation2d.fromDegrees(-gyro.getAngle()));
+    }
+    
+    public static int getAvgSpeed() {
+    		return (int) ((Math.abs(leftEncoder.getRate())+Math.abs(rightEncoder.getRate()))/2);
     }
     public static void periodic() {
     	SmartDashboard.putNumber("Left Encoder", leftEncoder.getDistance());

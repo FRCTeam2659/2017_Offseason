@@ -8,9 +8,12 @@ public class Hopper implements PathContainer {
 	 @Override
 	    public Path buildPath() {
 	        ArrayList<Waypoint> sWaypoints = new ArrayList<Waypoint>();
-	        sWaypoints.add(new Waypoint(0,50,0,0));
-	        sWaypoints.add(new Waypoint(70,50,40,70));
-	        sWaypoints.add(new Waypoint(100,90,0,70));
+	        //sWaypoints.add(new Waypoint(0,50,0,0));
+	        //sWaypoints.add(new Waypoint(70,50,40,70));
+	        //sWaypoints.add(new Waypoint(100,90,0,70));
+	        sWaypoints.add(new Waypoint(16,90,0,0));
+	        sWaypoints.add(new Waypoint(110,90,35,65));
+	        sWaypoints.add(new Waypoint(130,130,0,65));
 
 	        return PathBuilder.buildPathFromWaypoints(sWaypoints);
 	        //return PathAdapter.getBlueGearPath();
@@ -19,7 +22,7 @@ public class Hopper implements PathContainer {
 	    @Override
 	    public RigidTransform2d getStartPose() {
 	    		//return new RigidTransform2d(PathAdapter.getBlueGearPosition(), Rotation2d.fromDegrees(0.0)); 
-	    		return new RigidTransform2d(new Translation2d(0, 50), Rotation2d.fromDegrees(0.0)); 
+	    		return new RigidTransform2d(new Translation2d(16, 90), Rotation2d.fromDegrees(0.0)); 
 	    }
 
 	    @Override

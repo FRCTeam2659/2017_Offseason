@@ -12,11 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team2659.robot.commands.commandGroup.*;
 import org.usfirst.frc.team2659.robot.subsystems.*;
-import org.usfirst.frc.team2659.robot.util.BoilerGear;
 import org.usfirst.frc.team2659.robot.util.CsvLogger;
-import org.usfirst.frc.team2659.robot.util.Path;
-import org.usfirst.frc.team2659.robot.util.PathContainer;
-import org.usfirst.frc.team2659.robot.util.TortoDriveHelper;
 
 
 /**
@@ -33,8 +29,8 @@ public class Robot extends IterativeRobot {
     public static Climber climber;
     public static GearIntake intake;
     public static PowerDistributionPanel pdp = new PowerDistributionPanel();
-    private TortoDriveHelper myDrive = new TortoDriveHelper();
 	private static SendableChooser<CommandGroup> autoChooser = new SendableChooser<CommandGroup>();
+	//Command aim = new aim();
 	//private PathContainer mPathContainer = new BoilerGear();
 	//private Path mPath;
 	
@@ -52,14 +48,13 @@ public class Robot extends IterativeRobot {
 		intake = new GearIntake();
 		
 		oi = new OI();	
-		//RobotMap.gyro.calibrate();
+		RobotMap.gyro.calibrate();
 		autoChooser.addObject("Auto drive() method", new AutoRight1());
 		autoChooser.addObject("Auto cheatyDrive() method", new AutoRight());
-		autoChooser.addObject("Auto velocity method", new AutoLeft2());
 		autoChooser.addObject("Auto Blue Gear Hopper", new BlueGearHopper());
 		SmartDashboard.putData("AUTO", autoChooser);
 		
-		initLoggingChannels();
+		//initLoggingChannels();
 	}
 
 	/**
@@ -92,10 +87,7 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		//autonomousCommand = new AutoStraight();
 		drivetrain.zeroSensors();
-		
-		//mPath = mPathContainer.buildPath();
-		//drivetrain.setWantDrivePath(mPath, false);
-		//RobotStateEstimator.getInstance().onStart(Timer.getFPGATimestamp());
+
 		//autonomousCommand = (Command) autoChooser.getSelected();
 		//autonomousCommand.start();
 		//CsvLogger.init();
@@ -110,10 +102,6 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
 		//CsvLogger.logData(false);
-		//double timestamp = Timer.getFPGATimestamp();
-		//RobotStateEstimator.getInstance().onLoop(timestamp);
-		//drivetrain.updatePathFollower(timestamp);
-		//SmartDashboard.putNumber("timestamp", timestamp);
 	}
 
 	@Override
@@ -129,10 +117,6 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
 		RobotMap.periodic();
-		double throttle = oi.driveStick.getY();
-		double turn = oi.driveStick.getX();
-		drivetrain.setOpenLoop(myDrive.tortoDrive(throttle, turn, false,
-                true));
 		//CsvLogger.logData(false);
 	}
 	

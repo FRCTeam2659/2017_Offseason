@@ -175,7 +175,7 @@ public class PathAdapter {
     }
 
     public static RigidTransform2d getBlueStartPose() {
-    		return new RigidTransform2d(new Translation2d(0,50),kStartHeading);
+    		return new RigidTransform2d(new Translation2d(16,90),kStartHeading);
         /*return new RigidTransform2d(new Translation2d(15,
                 kFieldHeight / 2 + kFieldProfile.getBlueCenterToBoiler() - 16),
                 kStartHeading);*/

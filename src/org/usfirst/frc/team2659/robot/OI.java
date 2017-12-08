@@ -19,6 +19,8 @@ public class OI {
 	public Button driveButton2;
 	public Button driveButton3;
 	public Button driveButton10;
+	public Button driveReverseButton;
+	public Button driveNormalButton;
 	
 	public Button operatorButton1;
 	public Button operatorButton2;
@@ -71,6 +73,10 @@ public class OI {
 		
 		driveButton10 = new JoystickButton(driveStick, 10);
 		driveButton10.whenPressed(new AutoStraight());
+		
+		driveReverseButton = new JoystickButton(driveStick, 6);
+		
+		driveNormalButton = new JoystickButton(driveStick, 5);
 	}
 	 
 	public Joystick getjoystick() {

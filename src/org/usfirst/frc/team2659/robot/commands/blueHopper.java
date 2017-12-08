@@ -24,8 +24,9 @@ public class blueHopper extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    		RobotStateEstimator.getInstance().onLoop(Timer.getFPGATimestamp());
-    		Robot.drivetrain.updatePathFollower(Timer.getFPGATimestamp(), 1);
+    		double timestamp = Timer.getFPGATimestamp();
+    		RobotStateEstimator.getInstance().onLoop(timestamp);
+    		Robot.drivetrain.updatePathFollower(timestamp, 1);
     }
 
     // Make this return true when this Command no longer needs to run execute()

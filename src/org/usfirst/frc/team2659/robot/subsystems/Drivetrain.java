@@ -21,6 +21,7 @@ import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team2659.robot.Kinematics;
 import org.usfirst.frc.team2659.robot.RobotMap;
 import org.usfirst.frc.team2659.robot.RobotState;
+import org.usfirst.frc.team2659.robot.commands.drive;
 import org.usfirst.frc.team2659.robot.util.CANTalonFactory;
 import org.usfirst.frc.team2659.robot.util.DriveSignal;
 import org.usfirst.frc.team2659.robot.util.GripPipeline;
@@ -45,12 +46,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class Drivetrain extends Subsystem {
-	
-    private static final int kHighGearVelocityControlSlot = 1;
-    
+
     private Path mCurrentPath = null;
     private RobotState mRobotState = RobotState.getInstance();
     private PathFollower mPathFollower;
+    private boolean isHighGear = false;
 	
 	RobotDrive myDrive = RobotMap.myRobot;
 	SCWrapper drivetrainLeft = RobotMap.drivetrainLeft;
@@ -82,6 +82,7 @@ public class Drivetrain extends Subsystem {
 		 OPEN_LOOP, // open loop voltage control
 	     VELOCITY_SETPOINT, // velocity PID control
 	     PATH_FOLLOWING, // used for autonomous driving
+	     TURN_TO_HEADING, // turn in place
 	}
 	
 	protected static boolean usesTalonVelocityControl(DriveControlState state) {
@@ -90,6 +91,12 @@ public class Drivetrain extends Subsystem {
         }
         return false;
 	}
+	
+	protected static boolean usesTalonPositionControl(DriveControlState state) {
+        if (state == DriveControlState.TURN_TO_HEADING)
+            return true; 
+        return false;
+    }
 	
 	private DriveControlState mDriveControlState;
 	CANTalon mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
@@ -131,18 +138,18 @@ public class Drivetrain extends Subsystem {
         
 		leftVelRamp = new rampRate(1, 10);
 		rightVelRamp = new rampRate(1, 10);
-		leftDisPID.setPID(0.025, 0.0025, 0.05);//0.025, 0.00006
+		leftDisPID.setPID(0.18, 0.0025, 0.056);//0.025, 0.00006
 		leftDisPID.setSources(leftEncoder);
 		leftDisPID.setOutputs(drivetrainLeft);
-		rightDisPID.setPID(0.025, 0.0025, 0.05);
+		rightDisPID.setPID(0.18, 0.0025, 0.056);
 		rightDisPID.setSources(rightEncoder);
 		rightDisPID.setOutputs(drivetrainRight);
 		
-		leftRotatePID.setPID(0.02, 0.005, 0.3);
+		leftRotatePID.setPID(0.043, 0.0062, 0.3);
 		leftRotatePID.setSources(gyro);
 		leftRotatePID.setOutputs(drivetrainLeft);
 		leftRotatePID.setContinuous(false);
-		rightRotatePID.setPID(0.02, 0.005, 0.3);
+		rightRotatePID.setPID(0.043, 0.0062, 0.3);
 		rightRotatePID.setSources(gyro);
 		rightRotatePID.setOutputs(drivetrainRight);
 		rightRotatePID.setContinuous(false);
@@ -157,6 +164,8 @@ public class Drivetrain extends Subsystem {
 		rotatePID.setOutputRange(-10, 10);
 		rotatePID.setInputRange(-180, 180);
 		rotatePID.setContinuous(true);
+		
+		reloadGains();
 	}
 	
 	public synchronized void setOpenLoop(DriveSignal signal) {
@@ -202,22 +211,50 @@ public class Drivetrain extends Subsystem {
     private void configureTalonsForSpeedControl() {
         if (!usesTalonVelocityControl(mDriveControlState)) {
             // We entered a velocity control state.
+        		shiftLow();
             mLeftMaster.changeControlMode(CANTalon.TalonControlMode.Speed);
             mLeftMaster.setNominalClosedLoopVoltage(12.0);
-            mLeftMaster.setProfile(kHighGearVelocityControlSlot);
+            mLeftMaster.setProfile(1); //set the profile always to 1 for speed control
             mLeftMaster.configNominalOutputVoltage(0.5, -0.5);
-            mLeftMaster.setPID(0.22, 0.0, 0.0);
-            mLeftMaster.setF(0.1097);
+            
             mRightMaster.changeControlMode(CANTalon.TalonControlMode.Speed);
             mRightMaster.setNominalClosedLoopVoltage(12.0);
-            mRightMaster.setProfile(kHighGearVelocityControlSlot);
+            mRightMaster.setProfile(1);
             mRightMaster.configNominalOutputVoltage(0.5, -0.5);
-            mRightMaster.setPID(0.22, 0.0, 0.0);
-            mRightMaster.setF(0.1097);
+            
             setBrakeMode(true);
         }
     }
-	
+    
+    private void configureTalonsForPositionControl() {
+        if (!usesTalonPositionControl(mDriveControlState)) {
+            // We entered a position control state.
+        		shiftLow();
+            mLeftMaster.changeControlMode(CANTalon.TalonControlMode.MotionMagic);
+            mLeftMaster.setNominalClosedLoopVoltage(12.0);
+            mLeftMaster.setProfile(0);
+            mLeftMaster.configNominalOutputVoltage(0.5,-0.5);
+            mRightMaster.changeControlMode(CANTalon.TalonControlMode.MotionMagic);
+            mRightMaster.setNominalClosedLoopVoltage(12.0);
+            mRightMaster.setProfile(0);
+            mRightMaster.configNominalOutputVoltage(0.5,-0.5);
+            setBrakeMode(true);
+        }
+    }
+    
+    public synchronized void updatePositionSetpoint(double left_position_inches, double right_position_inches) {
+        if (usesTalonPositionControl(mDriveControlState)) {
+            mLeftMaster.set(5);
+            mRightMaster.set(5);
+            SmartDashboard.putString("success", "go");
+        } else {
+            System.out.println("Hit a bad position control state");
+            mLeftMaster.set(0);
+            mRightMaster.set(0);
+            SmartDashboard.putString("success", "nope");
+        }
+    }
+    
     public synchronized void setWantDrivePath(Path path, boolean reversed) {
         if (mCurrentPath != path || mDriveControlState != DriveControlState.PATH_FOLLOWING) {
             configureTalonsForSpeedControl();
@@ -263,7 +300,7 @@ public class Drivetrain extends Subsystem {
 
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
-	//	setDefaultCommand(new drive());
+		setDefaultCommand(new drive());
 	}
 	
     public double aim() {
@@ -277,41 +314,37 @@ public class Drivetrain extends Subsystem {
 	    	double centerX, centerY;
 	    	ArrayList<Point> center = new ArrayList<Point>();
 	    	if (result.isEmpty()) {
-	    		return 1;
+	    		return 0;
 	    	}
 	    	else {
 	    		for (int i = 0; i < result.size(); i++) {
 	    			Rect r = Imgproc.boundingRect(result.get(i));
 	    			
-	    			if (r.width/r.height < 5 && r.width/r.height > 3) {
-	    				SmartDashboard.putNumber("width" + i, r.width);
-		    			SmartDashboard.putNumber("height" + i, r.height);
+	    			//if (r.width/r.height < 5 && r.width/r.height > 3) {
 		    			centerX = r.x + r.width / 2;
 		    			centerY = r.y + r.height / 2;
 		    			center.add(new Point(centerX, centerY));
-	    			}
+	    			//}
 	    		}
 	    	}
-	    SmartDashboard.putNumber("goal_center", center.get(0).x);
 	    	
 	    	centerX = centerY = 0;
 	    	for (int i = 0; i < center.size(); i++) {
 	    		centerX += center.get(i).x;
-	    		centerY += center.get(i).y;
+	    		//centerY += center.get(i).y;
 	    	}
 	    	centerX /= center.size();
-	    	centerY /= center.size();
+	    	//centerY /= center.size();
 	    	
 	    	double angle;
-	    	if (centerX <= 320) {
-	    		angle = Math.atan((320-centerX)/320*Math.tan(Math.PI/6))/Math.PI*180;
-	    		SmartDashboard.putNumber("angle", -angle);
+	    	if (centerX <= 319.5) {
+	    		angle = Math.atan((319.5-centerX)/319.5/1.6512)/Math.PI*180; //the camera actual angle is 62.4
+	    		SmartDashboard.putNumber("angle1", -angle);
 	    		return -angle;
 	    	}
 	    	else {
-	    		angle = Math.atan((centerX-320)/320*Math.tan(Math.PI/6))/Math.PI*180;
-	    		//angle += 1;
-	    		SmartDashboard.putNumber("angle", angle);
+	    		angle = Math.atan((centerX-319.5)/319.5/1.6512)/Math.PI*180;
+	    		SmartDashboard.putNumber("angle2", angle);
 	    		return angle;
 	    	}
     }
@@ -354,10 +387,6 @@ public class Drivetrain extends Subsystem {
 		}
 	}
 	
-	public boolean curveVelDrive(double setpoint, double abs_dis_tolerance) {
-		return (leftEncoder.getDistance() - rightEncoder.getDistance()) / 2 > setpoint - abs_dis_tolerance;
-	}
-	
 	public void setVelocity(double left, double right) {
 		if (usesTalonVelocityControl(mDriveControlState)) {
             final double max_desired = Math.max(Math.abs(left), Math.abs(right));
@@ -372,22 +401,10 @@ public class Drivetrain extends Subsystem {
         }
 	}
 	
-	public synchronized void splineDrive(double distance, double maxSpeed, double angle, double curvature, double tolerance) {
-		configureTalonsForSpeedControl();
-        mDriveControlState = DriveControlState.VELOCITY_SETPOINT;
-        disPID.setSetpoint(distance);
-		disPID.setOutputRange(-maxSpeed, maxSpeed);
-        disPID.enable();
-        
-	}
-	
-	public synchronized void updateSplineDrive(double angle) {
-		double strikeVelocity = disdummy.getOutput();
-		double leftVelocity = strikeVelocity + angle;
-		double rightVelocity = strikeVelocity - angle;
-		setVelocity(leftVelocity, rightVelocity);
-	}
-	
+    private static double rotationsToInches(double rotations) {
+        return rotations * (3.1 * Math.PI);
+    }
+    
 	private static double inchesPerSecondToRpm(double inches_per_second) {
         return inchesToRotations(inches_per_second) * 60;
     }
@@ -409,18 +426,7 @@ public class Drivetrain extends Subsystem {
 		
 	    	return (leftDisPID.isOnTarget() && rightDisPID.isOnTarget());
 	}
-	public boolean turnTo(double angle, double tolerance) {
-		leftRotatePID.setSetpoint(angle);
-		rightDisPID.setSetpoint(0);
-		//rightRotatePID.setSetpoint(angle);
-		leftRotatePID.setAbsoluteTolerance(tolerance);
-		//rightRotatePID.setAbsoluteTolerance(tolerance);
-		leftRotatePID.enable();
-		rightDisPID.enable();
-		//rightRotatePID.enable();
-		
-		return leftRotatePID.isOnTarget();
-	}
+
 	public boolean driveForwardDistance(double distance) {
 		boolean i = true;
 		while (i) 
@@ -556,14 +562,31 @@ public class Drivetrain extends Subsystem {
 		rightRotatePID.enable();
 	}
 	
+	public void rotateDistance(double angle) {
+       /* configureTalonsForPositionControl();
+        mDriveControlState = DriveControlState.TURN_TO_HEADING;
+        updatePositionSetpoint(leftEncoder.getDistance() - wheel_delta.left, rightEncoder.getDistance() - wheel_delta.right);*/
+		Kinematics.DriveVelocity wheel_delta = Kinematics.inverseKinematics(new Twist2d(0,0,angle/180*Math.PI));
+		SmartDashboard.putNumber("leftdealta", wheel_delta.left);
+        leftDisPID.setSetpoint(leftEncoder.getDistance()-wheel_delta.left);
+        rightDisPID.setSetpoint(rightEncoder.getDistance()+wheel_delta.right);
+        leftDisPID.enable();
+        rightDisPID.enable();
+	}
+	
 	public void shiftHigh() {
 		cylinder.set(DoubleSolenoid.Value.kReverse);
+		isHighGear = true;
 	}
 	
 	public void shiftLow() {
 		cylinder.set(DoubleSolenoid.Value.kForward);
+		isHighGear = false;
 	}
 	
+	public boolean isHighGear() {
+		return isHighGear;
+	}
 	public void warriorDrive(double y, double z) {
 		double crap;
 		if (z < 0)
@@ -573,9 +596,29 @@ public class Drivetrain extends Subsystem {
 		myDrive.arcadeDrive(-y, crap);
 	}
 	
+	public void reloadGains() {
+		mLeftMaster.setPID(1.0, 0.002, 100.0, .45, 700, 240, 0);
+		mLeftMaster.setMotionMagicCruiseVelocity(75);
+		mLeftMaster.setMotionMagicAcceleration(200);
+		mRightMaster.setPID(1.0, 0.002, 100.0, .45, 700, 240, 0);
+		mRightMaster.setMotionMagicCruiseVelocity(75);
+		mRightMaster.setMotionMagicAcceleration(200);
+		mLeftMaster.setVoltageCompensationRampRate(0.0);
+		mRightMaster.setVoltageCompensationRampRate(0.0);
+		
+		mLeftMaster.setPID(0.8, 0.0, 6.0, .15, 0, 240, 1);
+		mRightMaster.setPID(0.8, 0.0, 6.0, .15, 0, 240, 1);
+	}
+	
 	public void zeroSensors() {
 		leftEncoder.reset();
 		rightEncoder.reset();
+		mLeftMaster.setEncPosition(0);
+		mLeftMaster.setPosition(0);
+		mRightMaster.setEncPosition(0);
+		mRightMaster.setPosition(0);
+		mLeftSlave.setPosition(0);
+		mRightSlave.setPosition(0);
 		gyro.reset();
 	}
 	

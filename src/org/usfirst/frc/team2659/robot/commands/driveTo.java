@@ -18,17 +18,18 @@ public class driveTo extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    		setTimeout(3);
+    		setTimeout(15);
+    		Robot.drivetrain.rotateDistance(60);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    		finished = Robot.drivetrain.driveTo(distance, tolerance);
+    		//finished = Robot.drivetrain.driveTo(distance, tolerance);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return finished || isTimedOut();
+        return isTimedOut();//finished || 
     }
 
     // Called once after isFinished returns true
