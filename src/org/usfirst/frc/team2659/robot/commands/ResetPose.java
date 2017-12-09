@@ -2,8 +2,8 @@ package org.usfirst.frc.team2659.robot.commands;
 
 import org.usfirst.frc.team2659.robot.Robot;
 import org.usfirst.frc.team2659.robot.RobotState;
-import org.usfirst.frc.team2659.robot.util.PathAdapter;
-import org.usfirst.frc.team2659.robot.util.RigidTransform2d;
+import org.usfirst.frc.team2659.robot.paths.Hopper;
+import org.usfirst.frc.team2659.robot.util.math.RigidTransform2d;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -16,9 +16,9 @@ public class ResetPose extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    		RigidTransform2d startPose = PathAdapter.getBlueStartPose();
+    		RigidTransform2d startPose = Hopper.getStartPose();
+    		Robot.drivetrain.zeroSensors();
         RobotState.getInstance().reset(Timer.getFPGATimestamp(), startPose);
-        Robot.drivetrain.setGyroAngle();
     }
 
     // Called repeatedly when this Command is scheduled to run

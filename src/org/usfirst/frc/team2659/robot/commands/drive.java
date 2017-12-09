@@ -27,7 +27,7 @@ public class drive extends Command {
 			isReversed = -1;
 		else if (Robot.oi.driveNormalButton.get())
 			isReversed = 1;
-		Robot.drivetrain.setOpenLoop(myDrive.tortoDrive(isReversed*Robot.oi.driveStick.getY(), Robot.oi.driveStick.getRawAxis(4), !Robot.drivetrain.isHighGear(), Robot.drivetrain.isHighGear()));
+		Robot.drivetrain.setOpenLoop(myDrive.tortoDrive(isReversed*Robot.oi.driveStick.getRawAxis(1), Robot.oi.driveStick.getRawAxis(4), !Robot.drivetrain.isHighGear(), Robot.drivetrain.isHighGear()));
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

@@ -1,7 +1,7 @@
 package org.usfirst.frc.team2659.robot;
 
-import org.usfirst.frc.team2659.robot.util.Rotation2d;
-import org.usfirst.frc.team2659.robot.util.Twist2d;
+import org.usfirst.frc.team2659.robot.util.math.Rotation2d;
+import org.usfirst.frc.team2659.robot.util.math.Twist2d;
 
 public class RobotStateEstimator {
 	 static RobotStateEstimator instance_ = new RobotStateEstimator();
@@ -26,10 +26,8 @@ public class RobotStateEstimator {
 	        final double left_distance = RobotMap.leftEncoder.getDistance();
 	        final double right_distance = -RobotMap.rightEncoder.getDistance();
 	        final Rotation2d gyro_angle = RobotMap.getGyroAngle();
-	        final Twist2d odometry_velocity = robot_state_.generateOdometryFromSensors(
-	                left_distance - left_encoder_prev_distance_, right_distance - right_encoder_prev_distance_, gyro_angle);
-	        final Twist2d predicted_velocity = Kinematics.forwardKinematics(RobotMap.leftEncoder.getRate(),
-	                -RobotMap.rightEncoder.getRate());
+	        final Twist2d odometry_velocity = robot_state_.generateOdometryFromSensors(left_distance - left_encoder_prev_distance_, right_distance - right_encoder_prev_distance_, gyro_angle);
+	        final Twist2d predicted_velocity = Kinematics.forwardKinematics(RobotMap.leftEncoder.getRate(),-RobotMap.rightEncoder.getRate());
 	        robot_state_.addObservations(timestamp, odometry_velocity, predicted_velocity);
 	        left_encoder_prev_distance_ = left_distance;
 	        right_encoder_prev_distance_ = right_distance;

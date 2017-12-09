@@ -9,17 +9,12 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
-/**
- *
- */
 public class GearIntake extends Subsystem {
 
 	PWMSpeedController SC = RobotMap.intakeSC;
 	DoubleSolenoid cylinder = RobotMap.intakeCylinder;
 	AnalogInput sensor = RobotMap.gearSensor;
 	RobotDrive myDrive = RobotMap.myRobot;
-	//PowerDistributionPanel powerPanel = RobotMap.pdp;
-	//public double current;
 	private double value;
 	private boolean i = true;
 	Timer t =  new Timer();
@@ -27,24 +22,18 @@ public class GearIntake extends Subsystem {
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
     }
-    public void autoRun() {	
+    public boolean autoRun() {	
 	    	value = sensor.getVoltage();
-	    	//current = powerPanel.getCurrent(4);
-	    	//t.start();
 	    	
 	    	if (value < 0.5)  {
 		    	cylinder.set(DoubleSolenoid.Value.kReverse);
 		    	SC.set(-1);
-		    	//t.delay(0.5);
+		    	return false;
 	    	}
-	    	/*else if (value < 0.5 && current >= 10)
-	    	{
-	    		cylinder.set(DoubleSolenoid.Value.kReverse);
-	    		SC.set(1);
-	    	}*/
 	    	else {
 	    		SC.set(0);
 			cylinder.set(DoubleSolenoid.Value.kForward);
+			return true;
 	    	}
     }
     
@@ -53,7 +42,7 @@ public class GearIntake extends Subsystem {
 	    	SC.set(1);
     }
     public void scoreGearAuto() { //all autonomous commands and operator use this method
-    	SC.set(1);
+    		SC.set(1);
     		if (i) {
 		    	t.start();
 		    	i = false;

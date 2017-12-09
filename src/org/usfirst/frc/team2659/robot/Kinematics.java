@@ -1,8 +1,8 @@
 package org.usfirst.frc.team2659.robot;
 
-import org.usfirst.frc.team2659.robot.util.RigidTransform2d;
-import org.usfirst.frc.team2659.robot.util.Rotation2d;
-import org.usfirst.frc.team2659.robot.util.Twist2d;
+import org.usfirst.frc.team2659.robot.util.math.RigidTransform2d;
+import org.usfirst.frc.team2659.robot.util.math.Rotation2d;
+import org.usfirst.frc.team2659.robot.util.math.Twist2d;
 
 public class Kinematics {
 	   private static final double kEpsilon = 1E-9;
@@ -12,8 +12,8 @@ public class Kinematics {
 	     * motion)
 	     */
 	    public static Twist2d forwardKinematics(double left_wheel_delta, double right_wheel_delta) {
-	        double delta_v = (right_wheel_delta - left_wheel_delta) / 2 * 0.924;
-	        double delta_rotation = delta_v * 2 / 26;
+	        double delta_v = (right_wheel_delta - left_wheel_delta) / 2; // /2 * 0.924 it's the constant for eliminating drifting
+	        double delta_rotation = delta_v * 2 / 25.5;
 	        return forwardKinematics(left_wheel_delta, right_wheel_delta, delta_rotation);
 	    }
 

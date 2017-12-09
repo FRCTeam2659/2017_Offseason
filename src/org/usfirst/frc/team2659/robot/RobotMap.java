@@ -2,7 +2,7 @@
 package org.usfirst.frc.team2659.robot;
 
 import org.usfirst.frc.team2659.robot.util.MultipleEncoderWrapper;
-import org.usfirst.frc.team2659.robot.util.Rotation2d;
+import org.usfirst.frc.team2659.robot.util.math.Rotation2d;
 import org.usfirst.frc.team2659.robot.util.SCWrapper;
 import org.usfirst.frc.team2659.robot.util.encoderWrapper;
 import org.usfirst.frc.team2659.robot.util.MultipleEncoderWrapper.MultipleEncoderWrapperMode;
@@ -75,7 +75,7 @@ public class RobotMap {
     	drivetrainLeft = new SCWrapper(leftFrontSC, leftRearSC);
     	drivetrainRight = new SCWrapper(rightFrontSC, rightRearSC);
     	
-   /* myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);*/
+    myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);
     	
     	climberSC = new VictorSP(4);
     	   	

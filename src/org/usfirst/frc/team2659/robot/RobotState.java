@@ -4,9 +4,9 @@ import java.util.Map;
 
 import org.usfirst.frc.team2659.robot.util.InterpolatingDouble;
 import org.usfirst.frc.team2659.robot.util.InterpolatingTreeMap;
-import org.usfirst.frc.team2659.robot.util.RigidTransform2d;
-import org.usfirst.frc.team2659.robot.util.Rotation2d;
-import org.usfirst.frc.team2659.robot.util.Twist2d;
+import org.usfirst.frc.team2659.robot.util.math.RigidTransform2d;
+import org.usfirst.frc.team2659.robot.util.math.Rotation2d;
+import org.usfirst.frc.team2659.robot.util.math.Twist2d;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 

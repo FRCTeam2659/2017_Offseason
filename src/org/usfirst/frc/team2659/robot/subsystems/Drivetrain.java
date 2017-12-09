@@ -22,19 +22,18 @@ import org.usfirst.frc.team2659.robot.Kinematics;
 import org.usfirst.frc.team2659.robot.RobotMap;
 import org.usfirst.frc.team2659.robot.RobotState;
 import org.usfirst.frc.team2659.robot.commands.drive;
-import org.usfirst.frc.team2659.robot.util.CANTalonFactory;
+import org.usfirst.frc.team2659.robot.util.drivers.CANTalonFactory;
 import org.usfirst.frc.team2659.robot.util.DriveSignal;
 import org.usfirst.frc.team2659.robot.util.GripPipeline;
-import org.usfirst.frc.team2659.robot.util.Lookahead;
-import org.usfirst.frc.team2659.robot.util.Path;
-import org.usfirst.frc.team2659.robot.util.PathFollower;
-import org.usfirst.frc.team2659.robot.util.RigidTransform2d;
+import org.usfirst.frc.team2659.robot.util.control.Lookahead;
+import org.usfirst.frc.team2659.robot.util.control.Path;
+import org.usfirst.frc.team2659.robot.util.control.PathFollower;
+import org.usfirst.frc.team2659.robot.util.math.RigidTransform2d;
 import org.usfirst.frc.team2659.robot.util.SCWrapper;
-import org.usfirst.frc.team2659.robot.util.Twist2d;
+import org.usfirst.frc.team2659.robot.util.math.Twist2d;
 import org.usfirst.frc.team2659.robot.util.dummyPIDOutput;
 import org.usfirst.frc.team2659.robot.util.encoderWrapper;
-import org.usfirst.frc.team2659.robot.util.rampRate;
-import org.usfirst.frc.team2659.robot.util.warriorPID;
+import org.usfirst.frc.team2659.robot.util.control.warriorPID;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.StatusFrameRate;
@@ -42,7 +41,6 @@ import com.ctre.CANTalon.VelocityMeasurementPeriod;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
 
 public class Drivetrain extends Subsystem {
@@ -51,6 +49,8 @@ public class Drivetrain extends Subsystem {
     private RobotState mRobotState = RobotState.getInstance();
     private PathFollower mPathFollower;
     private boolean isHighGear = false;
+	Timer t = new Timer();
+	private final double critical = 3.15 * 3.141 / 256;
 	
 	RobotDrive myDrive = RobotMap.myRobot;
 	SCWrapper drivetrainLeft = RobotMap.drivetrainLeft;
@@ -69,8 +69,6 @@ public class Drivetrain extends Subsystem {
 	warriorPID rightRotatePID = new warriorPID();
 	warriorPID disPID = new warriorPID();
 	warriorPID rotatePID = new warriorPID();
-	rampRate leftVelRamp;
-	rampRate rightVelRamp;
 	dummyPIDOutput leftdummy = new dummyPIDOutput();
 	dummyPIDOutput rightdummy = new dummyPIDOutput();
 	dummyPIDOutput disdummy = new dummyPIDOutput();
@@ -136,8 +134,6 @@ public class Drivetrain extends Subsystem {
         mRightMaster.SetVelocityMeasurementPeriod(VelocityMeasurementPeriod.Period_10Ms);
         mRightMaster.SetVelocityMeasurementWindow(32);
         
-		leftVelRamp = new rampRate(1, 10);
-		rightVelRamp = new rampRate(1, 10);
 		leftDisPID.setPID(0.18, 0.0025, 0.056);//0.025, 0.00006
 		leftDisPID.setSources(leftEncoder);
 		leftDisPID.setOutputs(drivetrainLeft);
@@ -244,9 +240,9 @@ public class Drivetrain extends Subsystem {
     
     public synchronized void updatePositionSetpoint(double left_position_inches, double right_position_inches) {
         if (usesTalonPositionControl(mDriveControlState)) {
-            mLeftMaster.set(5);
-            mRightMaster.set(5);
-            SmartDashboard.putString("success", "go");
+            mLeftMaster.set(left_position_inches);
+            mRightMaster.set(right_position_inches);
+            SmartDashboard.putString("success", "yup");
         } else {
             System.out.println("Hit a bad position control state");
             mLeftMaster.set(0);
@@ -259,7 +255,7 @@ public class Drivetrain extends Subsystem {
         if (mCurrentPath != path || mDriveControlState != DriveControlState.PATH_FOLLOWING) {
             configureTalonsForSpeedControl();
             RobotState.getInstance().resetDistanceDriven();
-            mPathFollower = new PathFollower(path, reversed, new PathFollower.Parameters(new Lookahead(12.0, 24.0, 9.0, 80), 0.0, 5.0, 0.03, 0.02, 1.0, 0.05, 80, 120, 0.75, 12.0, 9.0));
+            mPathFollower = new PathFollower(path, reversed, new PathFollower.Parameters(new Lookahead(12.0, 24.0, 6.0, 75), 0.0, 5.0, 0.03, 0.02, 1.0, 0.05, 75, 120, 0.75, 12.0, 9.0));
             mDriveControlState = DriveControlState.PATH_FOLLOWING;
             mCurrentPath = path;
         } else {
@@ -271,12 +267,12 @@ public class Drivetrain extends Subsystem {
      * Called periodically when the robot is in path following mode. Updates the path follower with the robots latest
      * pose, distance driven, and velocity, the updates the wheel velocity setpoints.
      */
-    public void updatePathFollower(double timestamp, double sign) {
+    public void updatePathFollower(double timestamp) {
         RigidTransform2d robot_pose = mRobotState.getLatestFieldToVehicle().getValue();
         Twist2d command = mPathFollower.update(timestamp, robot_pose, RobotState.getInstance().getDistanceDriven(), RobotState.getInstance().getPredictedVelocity().dx);
         if (!mPathFollower.isFinished()) {
             Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
-            setVelocity(sign*setpoint.left, sign*setpoint.right);
+            setVelocity(setpoint.left, setpoint.right);
         } else {
             setVelocity(0, 0);
         }
@@ -290,13 +286,6 @@ public class Drivetrain extends Subsystem {
             return true;
         }
     }
-  
-    public synchronized void setGyroAngle() {
-        gyro.reset();
-    }
-    
-	Timer t = new Timer();
-	private final double critical = 3.15 * 3.141 / 256;
 
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
@@ -348,29 +337,6 @@ public class Drivetrain extends Subsystem {
 	    		return angle;
 	    	}
     }
-	
-	public void curveDrive(double distance, double angle) {
-		leftDisPID.setOutputs(leftdummy); //don't use this!!!
-		leftDisPID.setOutputRange(-1, 1);
-		leftDisPID.setSetpoint(distance);
-		
-		leftDisPID.enable();
-		rotatePID.enable();
-	
-			double percentDone = (leftEncoder.getDistance() + rightEncoder.getDistance())/2/(distance);
-			if (percentDone > 1) {
-				percentDone = 1;
-			} else if (percentDone < 0) {
-				percentDone = 0;
-			}
-			rotatePID.setSetpoint(angle * percentDone);
-			
-			double leftVelocity = leftdummy.getOutput() + rotatedummy.getOutput();
-			double rightVelocity = leftdummy.getOutput() - rotatedummy.getOutput();
-			leftVelocity = leftVelRamp.getNextValue(leftVelocity);
-			rightVelocity = rightVelRamp.getNextValue(rightVelocity);
-			setVelocity(leftVelocity, rightVelocity);		
-	}
 	
 	public boolean curve1Drive(double distance, double r, double tolerance) {
 		rightDisPID.setOutputs(rightdummy);
@@ -606,8 +572,8 @@ public class Drivetrain extends Subsystem {
 		mLeftMaster.setVoltageCompensationRampRate(0.0);
 		mRightMaster.setVoltageCompensationRampRate(0.0);
 		
-		mLeftMaster.setPID(0.8, 0.0, 6.0, .15, 0, 240, 1);
-		mRightMaster.setPID(0.8, 0.0, 6.0, .15, 0, 240, 1);
+		mLeftMaster.setPID(0.86, 0.0, 6.0, .15, 0, 240, 1);
+		mRightMaster.setPID(0.86, 0.0, 6.0, .15, 0, 240, 1);
 	}
 	
 	public void zeroSensors() {

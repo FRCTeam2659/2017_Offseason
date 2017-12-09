@@ -50,7 +50,6 @@ public class Robot extends IterativeRobot {
 		oi = new OI();	
 		RobotMap.gyro.calibrate();
 		autoChooser.addObject("Auto drive() method", new AutoRight1());
-		autoChooser.addObject("Auto cheatyDrive() method", new AutoRight());
 		autoChooser.addObject("Auto Blue Gear Hopper", new BlueGearHopper());
 		SmartDashboard.putData("AUTO", autoChooser);
 		

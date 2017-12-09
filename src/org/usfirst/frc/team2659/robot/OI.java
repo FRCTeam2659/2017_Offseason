@@ -2,7 +2,10 @@ package org.usfirst.frc.team2659.robot;
 
 
 import org.usfirst.frc.team2659.robot.commands.*;
+
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
@@ -12,7 +15,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
  */
 public class OI {
 	
-	public Joystick driveStick;
+	public XboxController driveStick;
 	public Joystick operatorStick;
 	
 	public Button driveButton1;
@@ -32,7 +35,7 @@ public class OI {
 	public Button operatorButton8;
 	
 	public OI() {	
-		driveStick = new Joystick(0);
+		driveStick = new XboxController(0);
 		operatorStick = new Joystick(1);
 		
 		operatorButton3 = new JoystickButton(driveStick, 2);
@@ -79,7 +82,7 @@ public class OI {
 		driveNormalButton = new JoystickButton(driveStick, 5);
 	}
 	 
-	public Joystick getjoystick() {
+	public XboxController getjoystick() {
 		return driveStick;
 	}
 }
