@@ -1,4 +1,3 @@
-
 package org.usfirst.frc.team2659.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -30,9 +29,6 @@ public class Robot extends IterativeRobot {
     public static GearIntake intake;
     public static PowerDistributionPanel pdp = new PowerDistributionPanel();
 	private static SendableChooser<CommandGroup> autoChooser = new SendableChooser<CommandGroup>();
-	//Command aim = new aim();
-	//private PathContainer mPathContainer = new BoilerGear();
-	//private Path mPath;
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -49,8 +45,8 @@ public class Robot extends IterativeRobot {
 		
 		oi = new OI();	
 		RobotMap.gyro.calibrate();
-		autoChooser.addObject("Auto drive() method", new AutoRight1());
-		autoChooser.addObject("Auto Blue Gear Hopper", new BlueGearHopper());
+		//autoChooser.addObject("Auto drive() method", new AutoRight1());
+		autoChooser.addDefault("Auto Blue Gear Hopper", new BlueGearHopper());
 		SmartDashboard.putData("AUTO", autoChooser);
 		
 		//initLoggingChannels();
@@ -63,7 +59,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void disabledInit() {
-
+		drivetrain.stop();
 	}
 
 	@Override

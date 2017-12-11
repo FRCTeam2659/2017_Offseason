@@ -42,7 +42,6 @@ import com.ctre.CANTalon.VelocityMeasurementPeriod;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
 public class Drivetrain extends Subsystem {
 
     private Path mCurrentPath = null;
@@ -120,7 +119,7 @@ public class Drivetrain extends Subsystem {
         mRightMaster.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
         mRightMaster.reverseSensor(false);
         mRightMaster.reverseOutput(true);
-        CANTalon.FeedbackDeviceStatus rightSensorPresent = mLeftMaster
+        CANTalon.FeedbackDeviceStatus rightSensorPresent = mRightMaster
                 .isSensorPresent(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
         if (rightSensorPresent != CANTalon.FeedbackDeviceStatus.FeedbackStatusPresent) {
             DriverStation.reportError("Could not detect right encoder: " + rightSensorPresent, false);

@@ -3,36 +3,30 @@ package org.usfirst.frc.team2659.robot;
 
 import org.usfirst.frc.team2659.robot.commands.*;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
-/**
- * This class is the glue that binds the controls on the physical operator
- * interface to the commands and command groups that allow control of the robot.
- */
 public class OI {
 	
 	public XboxController driveStick;
 	public Joystick operatorStick;
 	
-	public Button driveButton1;
-	public Button driveButton2;
-	public Button driveButton3;
-	public Button driveButton10;
+	private Button driveButton1;
+	private Button driveButton2;
+	private Button driveButton3;
+	private Button driveButton10;
 	public Button driveReverseButton;
 	public Button driveNormalButton;
 	
-	public Button operatorButton1;
-	public Button operatorButton2;
-	public Button operatorButton3;
-	public Button operatorButton4;
-	public Button operatorButton5;
-	public Button operatorButton6;
-	public Button operatorButton7;
-	public Button operatorButton8;
+	private Button operatorButton1;
+	private Button operatorButton2;
+	private Button operatorButton3;
+	private Button operatorButton4;
+	private Button operatorButton5;
+	private Button operatorButton7;
+	private Button operatorButton8;
 	
 	public OI() {	
 		driveStick = new XboxController(0);

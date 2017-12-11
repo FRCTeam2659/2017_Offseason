@@ -75,7 +75,7 @@ public class RobotMap {
     	drivetrainLeft = new SCWrapper(leftFrontSC, leftRearSC);
     	drivetrainRight = new SCWrapper(rightFrontSC, rightRearSC);
     	
-    myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);
+   // myRobot = new RobotDrive(drivetrainLeft, drivetrainRight);
     	
     	climberSC = new VictorSP(4);
     	   	
